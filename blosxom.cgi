@@ -165,7 +165,7 @@ sub load_template {
   return &$template(@_);
 }
 
-# Define default find subroutine
+# Define default entries subroutine
 $entries =
   sub {
     my(%files, %indexes, %others);
