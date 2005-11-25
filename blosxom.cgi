@@ -147,6 +147,7 @@ while (<DATA>) {
 # Plugins: Start
 if ( $plugin_dir and opendir PLUGINS, $plugin_dir ) {
   foreach my $plugin ( grep { /^\w+$/ && -f "$plugin_dir/$_"  } sort readdir(PLUGINS) ) {
+    next if ($plugin =~ /~$/);   # Ignore emacs backups
     my($plugin_name, $off) = $plugin =~ /^\d*(\w+?)(_?)$/;
     my $on_off = $off eq '_' ? -1 : 1;
     require "$plugin_dir/$plugin";
