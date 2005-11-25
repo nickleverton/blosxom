@@ -375,7 +375,7 @@ sub generate {
       # Plugins: Story
       foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('story') and $entries = $plugin->story($path, $fn, \$story, \$title, \$body) }
       
-      if ($content_type =~ m{\Wxml$}) {
+      if ($content_type =~ m{\bxml\b$}) {
         # Escape <, >, and &, and to produce valid RSS
         my %escape = ('<'=>'&lt;', '>'=>'&gt;', '&'=>'&amp;', '"'=>'&quot;');  
         my $escape_re  = join '|' => keys %escape;
