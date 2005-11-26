@@ -237,7 +237,6 @@ if (!$ENV{GATEWAY_INTERFACE} and param('-password') and $static_password and par
     foreach ( ('', split /\//, $path) ) {
       $p .= "/$_";
       $p =~ s!^/!!;
-      $path_info = $p;
       $done{$p}++ and next;
       (-d "$static_dir/$p" or $p =~ /\.$file_extension$/) or mkdir "$static_dir/$p", 0755;
       foreach $flavour ( @static_flavours ) {
@@ -247,10 +246,17 @@ if (!$ENV{GATEWAY_INTERFACE} and param('-password') and $static_password and par
         param('-quiet') or print "$fn.$flavour\n";
         my $fh_w = new FileHandle "> $static_dir/$fn.$flavour" or die "Couldn't open $static_dir/$p for writing: $!";  
         $output = '';
-        print $fh_w 
-          $indexes{$path} == 1
-            ? &generate('static', $p, '', $flavour, $content_type)
-            : &generate('static', '', $p, $flavour, $content_type);
+        if ($indexes{$path} == 1) {
+          # category
+          $path_info = $p;
+          print $fh_w &generate('static', $p, '', $flavour, $content_type);
+        } else {
+          # date
+          local ($path_info_yr,$path_info_mo,$path_info_da, $path_info) = 
+              split /\//, $p, 4;
+          unless (defined $path_info) {$path_info = ""};
+          print $fh_w &generate('static', '', $p, $flavour, $content_type);
+        }
         $fh_w->close;
       }
     }
