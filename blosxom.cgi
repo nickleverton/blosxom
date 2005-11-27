@@ -2,8 +2,9 @@
 
 # Blosxom
 # Author: Rael Dornfest <rael@oreilly.com>
-# Version: 2.0
-# Home/Docs/Licensing: http://www.raelity.org/apps/blosxom/
+# Version: 2.0.1
+# Home/Docs/Licensing: http://www.blosxom.com/
+# Development/Downloads: http://sourceforge.net/projects/blosxom
 
 package blosxom;
 
