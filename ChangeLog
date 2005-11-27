@@ -1,0 +1,5 @@
+v2.0.1
+	* Fixed XML escaping of RSS feeds
+	* Ignore editor backup files in the plugin directory
+	  (i.e. "myplugin~")
+	* Set path_info variables correctly for all static pages.
