@@ -247,7 +247,9 @@ if (!$ENV{GATEWAY_INTERFACE} and param('-password') and $static_password and par
         if ($indexes{$path} == 1) {
           # category
           $path_info = $p;
-          print $fh_w &generate('static', $p, '', $flavour, $content_type);
+          # individual story
+          $path_info =~ s!\.$file_extension$!\.$flavour!;
+          print $fh_w &generate('static', $path_info, '', $flavour, $content_type);
         } else {
           # date
           local ($path_info_yr,$path_info_mo,$path_info_da, $path_info) = 
