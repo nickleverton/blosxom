@@ -221,10 +221,7 @@ $entries =
 my $tmp; foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('entries') and defined($tmp = $plugin->entries()) and $entries = $tmp and last; }
 
 my ($files, $indexes, $others) = &$entries();
-%files = %$files; %indexes = %$indexes; %others = ref $others ? %$others : ();
-
-# Plugins: Filter
-foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('filter') and $entries = $plugin->filter(\%files, \%others) }
+%indexes = %$indexes;
 
 # Static
 if (!$ENV{GATEWAY_INTERFACE} and param('-password') and $static_password and param('-password') eq $static_password) {
@@ -280,6 +277,11 @@ foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('end') 
 # Generate 
 sub generate {
   my($static_or_dynamic, $currentdir, $date, $flavour, $content_type) = @_;
+
+  %files = %$files; %others = ref $others ? %$others : ();
+
+  # Plugins: Filter
+  foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('filter') and $entries = $plugin->filter(\%files, \%others) }
 
   my %f = %files;
 
