@@ -84,8 +84,17 @@ my $fh = new FileHandle;
 @num2month = sort { $month2num{$a} <=> $month2num{$b} } keys %month2num;
 
 # Use the stated preferred URL or figure it out automatically
-$url ||= url();
-$url =~ s/^included:/http:/; # Fix for Server Side Includes (SSI)
+$url ||= url(-path_info => 1);
+$url =~ s/^included:/http:/ if $ENV{SERVER_PROTOCOL} eq 'INCLUDED';
+
+# NOTE: Since v3.12, it looks as if CGI.pm misbehaves for SSIs and
+# always appends path_info to the url. To fix this, we always
+# request an url with path_info, and always remove it from the end of the
+# string.
+my $pi_len = length $ENV{PATH_INFO};
+my $might_be_pi = substr($url, -$pi_len);
+substr($url, -length $ENV{PATH_INFO}) = '' if $might_be_pi eq $ENV{PATH_INFO};
+
 $url =~ s!/$!!;
 
 # Drop ending any / from dir settings
