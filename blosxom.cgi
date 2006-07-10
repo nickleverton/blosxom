@@ -183,7 +183,7 @@ sub load_template {
   return &$template(@_);
 }
 
-# Define default entries subroutine
+# Define default find subroutine
 $entries =
   sub {
     my(%files, %indexes, %others);
@@ -363,7 +363,7 @@ sub generate {
       ($path,$fn) = $path_file =~ m!^$datadir/(?:(.*)/)?(.*)\.$file_extension!;
   
       # Only stories in the right hierarchy
-      $path =~ /^$currentdir(?=$|/)/ or $path_file eq "$datadir/$currentdir" or next;
+      $path =~ /^$currentdir(?=$|\/)/ or $path_file eq "$datadir/$currentdir" or next;
   
       # Prepend a slash for use in templates only if a path exists
       $path &&= "/$path";
