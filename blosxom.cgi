@@ -139,10 +139,10 @@ $template =
 # Bring in the templates
 %template = ();
 while (<DATA>) {
-  last if /^(__END__)?$/;
-  my($ct, $comp, $txt) = /^(\S+)\s(\S+)\s(.*)$/;
+  last if /^(__END__)$/;
+  my($ct, $comp, $txt) = /^(\S+)\s(\S+)\s(.*)$/ or next;
   $txt =~ s/\\n/\n/mg;
-  $template{$ct}{$comp} = $txt;
+  $template{$ct}{$comp} .= $txt . "\n";
 }
 
 # Plugins: Start
@@ -439,18 +439,73 @@ sub nice_date {
 # Default HTML and RSS template bits
 __DATA__
 html content_type text/html
-html head <html><head><link rel="alternate" type="type="application/rss+xml" title="RSS" href="$url/index.rss" /><title>$blog_title $path_info_da $path_info_mo $path_info_yr</title></head><body><center><font size="+3">$blog_title</font><br />$path_info_da $path_info_mo $path_info_yr</center><p />
-html story <p><a name="$fn"><b>$title</b></a><br />$body<br /><br />posted at: $ti | path: <a href="$url$path">$path</a> | <a href="$url/$yr/$mo_num/$da#$fn">permanent link to this entry</a></p>\n
-html date <h3>$dw, $da $mo $yr</h3>\n
-html foot <p /><center><a href="http://www.blosxom.com/"><img src="http://www.blosxom.com/images/pb_blosxom.gif" border="0" /></a></body></html>
+
+html head <html>
+html head     <head>
+html head         <link rel="alternate" type="type="application/rss+xml" title="RSS" href="$url/index.rss" />
+html head         <title>$blog_title $path_info_da $path_info_mo $path_info_yr
+html head         </title>
+html head     </head>
+html head     <body>
+html head         <center>
+html head             <font size="+3">$blog_title</font><br />
+html head             $path_info_da $path_info_mo $path_info_yr
+html head         </center>
+html head         <p />
+
+html story        <p>
+html story            <a name="$fn"><b>$title</b></a><br />
+html story            $body<br />
+html story            <br />
+html story            posted at: $ti | path: <a href="$url$path">$path </a> | <a href="$url/$yr/$mo_num/$da#$fn">permanent link to this entry</a>
+html story        </p>
+
+html date         <h3>$dw, $da $mo $yr</h3>
+
+html foot
+html foot         <p />
+html foot         <center>
+html foot             <a href="http://www.blosxom.com/"><img src="http://www.blosxom.com/images/pb_blosxom.gif" border="0" /></a>
+html foot         </center>
+html foot     </body>
+html foot </html>
+
 rss content_type text/xml
-rss head <?xml version="1.0"?>\n<!-- name="generator" content="blosxom/$version" -->\n<!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN" "http://my.netscape.com/publish/formats/rss-0.91.dtd">\n\n<rss version="0.91">\n  <channel>\n    <title>$blog_title $path_info_da $path_info_mo $path_info_yr</title>\n    <link>$url</link>\n    <description>$blog_description</description>\n    <language>$blog_language</language>\n
-rss story   <item>\n    <title>$title</title>\n    <link>$url/$yr/$mo_num/$da#$fn</link>\n    <description>$body</description>\n  </item>\n
-rss date \n
-rss foot   </channel>\n</rss>
+
+rss head <?xml version="1.0"?>
+rss head <!-- name="generator" content="blosxom/$version" -->
+rss head <!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN" "http://my.netscape.com/publish/formats/rss-0.91.dtd">
+rss head 
+rss head <rss version="0.91">
+rss head   <channel>
+rss head     <title>$blog_title $path_info_da $path_info_mo $path_info_yr</title>
+rss head     <link>$url</link>
+rss head     <description>$blog_description</description>
+rss head     <language>$blog_language</language>
+
+rss story   <item>
+rss story     <title>$title</title>
+rss story     <link>$url/$yr/$mo_num/$da#$fn</link>
+rss story     <description>$body</description>
+rss story   </item>
+
+rss date 
+
+rss foot   </channel>
+rss foot </rss>
+
 error content_type text/html
-error head <html><body><p><font color="red">Error: I'm afraid this is the first I've heard of a "$flavour" flavoured Blosxom.  Try dropping the "/+$flavour" bit from the end of the URL.</font>\n\n
-error story <p><b>$title</b><br />$body <a href="$url/$yr/$mo_num/$da#fn.$default_flavour">#</a></p>\n
-error date <h3>$dw, $da $mo $yr</h3>\n
-error foot </body></html>
+
+error head <html>
+error head <body>
+error head     <p><font color="red">Error: I'm afraid this is the first I've heard of a "$flavour" flavoured Blosxom.  Try dropping the "/+$flavour" bit from the end of the URL.</font>
+
+
+error story <p><b>$title</b><br />
+error story $body <a href="$url/$yr/$mo_num/$da#fn.$default_flavour">#</a></p>
+
+error date <h3>$dw, $da $mo $yr</h3>
+
+error foot     </body>
+error foot </html>
 __END__
