@@ -143,13 +143,20 @@ $template =
       return join '', <$fh> if $fh->open("< $datadir/$path/$chunk.$flavour");
     } while ($path =~ s/(\/*[^\/]*)$// and $1);
 
-    return join '', ($template{$flavour}{$chunk} || $template{error}{$chunk} || '');
+    # Check for definedness, since flavour can be the empty string
+    if (defined $template{$flavour}{$chunk}) {
+	return $template{$flavour}{$chunk};
+    } elsif (defined $template{error}{$chunk}) {
+	return $template{error}{$chunk} 
+    } else {
+	return '';
+    }
   };
 # Bring in the templates
 %template = ();
 while (<DATA>) {
   last if /^(__END__)$/;
-  my($ct, $comp, $txt) = /^(\S+)\s(\S+)\s(.*)$/ or next;
+  my($ct, $comp, $txt) = /^(\S+)\s(\S+)(?:\s(.*))?$/ or next;
   $txt =~ s/\\n/\n/mg;
   $template{$ct}{$comp} .= $txt . "\n";
 }
