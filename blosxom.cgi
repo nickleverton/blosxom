@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest <rael@oreilly.com>
-# Version: 2.0.1
+# Version: 2.0.2
 # Home/Docs/Licensing: http://www.blosxom.com/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -76,7 +76,7 @@ use File::stat;
 use Time::localtime;
 use CGI qw/:standard :netscape/;
 
-$version = "2.0";
+$version = "2.0.2";
 
 my $fh = new FileHandle;
 
