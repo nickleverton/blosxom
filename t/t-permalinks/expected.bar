@@ -1,0 +1,30 @@
+Content-Type: text/html; charset=ISO-8859-1
+
+<html>
+    <head>
+        <link rel="alternate" type="type="application/rss+xml" title="RSS" href="http://localhost/./blosxom.cgi/index.rss" />
+        <title>My Weblog   
+        </title>
+    </head>
+    <body>
+        <center>
+            <font size="+3">My Weblog</font><br />
+              
+        </center>
+        <p />
+        <h3>Tue, 25 Jul 2006</h3>
+       <p>
+           <a name="bar"><b>Lorem ipsum</b></a><br />
+           Lorem ipsum dolor sit amet ipso facto.Lorem ipsum dolor sit amet ipso
+facto.Lorem ipsum dolor sit amet ipso facto. Lorem ipsum dolor sit
+amet ipso facto.Lorem ipsum dolor sit amet ipso facto. <br />
+           <br />
+           posted at: 11:02 | path: <a href="http://localhost/./blosxom.cgi/foo">/foo </a> | <a href="http://localhost/./blosxom.cgi/2006/07/25#bar">permanent link to this entry</a>
+       </p>
+
+        <p />
+        <center>
+            <a href="http://www.blosxom.com/"><img src="http://www.blosxom.com/images/pb_blosxom.gif" border="0" /></a>
+        </center>
+    </body>
+</html>

@@ -1,0 +1,16 @@
+tests:
+  - 
+    - ""
+    - expected.html
+  -
+    - /foo
+    - expected.html
+  -
+    - /foo#bar
+    - expected.html
+  -
+    - /foo/bar.html
+    - expected.bar
+#  -
+#    - /2006/07/25/bar.html
+#    - expected.bar
