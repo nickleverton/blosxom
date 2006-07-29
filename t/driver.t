@@ -7,6 +7,7 @@ use Test::More qw( no_plan );
 
 use File::Copy;
 use File::Compare;
+use File::Find;
 use Cwd;
 use YAML;
 
@@ -38,6 +39,8 @@ for my $testdir (@tests) {
   system("perl -pi -e 's{/Library/WebServer/Documents/blosxom}{$cwd/data}' blosxom.cgi") == 0
       or die "$!";
 
+  touch_files ();
+
   for (@{$spec->{tests}}) {
     my ($args, $output) = @$_;
 
@@ -59,3 +62,14 @@ for my $testdir (@tests) {
   chdir $orig_cwd;
 }
 
+
+
+sub touch_files {
+  find( sub {
+    if (/^(.*)\.(\d+)$/) {
+      copy($_, $1);
+      `touch -t $2 $1`;
+    }
+  },
+        "./data");
+}
