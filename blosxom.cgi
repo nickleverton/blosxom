@@ -65,6 +65,22 @@ $static_password = "";
 # 0 = no, 1 = yes
 $static_entries = 0;
 
+## On Debian GNU/Linux systems, read configuration files (if found)
+## Dirk Eddelbuettel <edd@debian.org>
+$conffile = undef;
+use Getopt::Long qw(:config pass_through );
+GetOptions("f=s" => \$conffile);
+for $rcfile ("/etc/blosxom/blosxom.conf", "/etc/blosxom.conf", (defined $conffile ? ($conffile) : ()) ) {
+  if (-r $rcfile) {
+    open (RC, "< $rcfile") or die "Cannot open $rcfile: $!";
+    while (<RC>) {
+      eval("$_");
+    }
+    close (RC);
+  }
+}
+
+
 # --------------------------------
 
 use vars qw! $version $blog_title $blog_description $blog_language $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others !;
@@ -73,8 +89,10 @@ use strict;
 use FileHandle;
 use File::Find;
 use File::stat;
+use POSIX qw(tzname tzset);
 use Time::localtime;
 use CGI qw/:standard :netscape/;
+use CGI::Carp;	#NJL
 
 $version = "2.0.2";
 
@@ -165,6 +183,7 @@ while (<DATA>) {
 if ( $plugin_dir and opendir PLUGINS, $plugin_dir ) {
   foreach my $plugin ( grep { /^\w+$/ && -f "$plugin_dir/$_"  } sort readdir(PLUGINS) ) {
     next if ($plugin =~ /~$/);   # Ignore emacs backups
+    next if ($plugin =~ /\.dpkg-(?:old|new|orig|tmp|dist)$/);   # Ignore Debian dpkg backups
     my($plugin_name, $off) = $plugin =~ /^\d*(\w+?)(_?)$/;
     my $on_off = $off eq '_' ? -1 : 1;
     require "$plugin_dir/$plugin";
@@ -369,8 +388,8 @@ sub generate {
       $path &&= "/$path";
 
       # Date fiddling for by-{year,month,day} archive views
-      use vars qw/ $dw $mo $mo_num $da $ti $yr $hr $min $hr12 $ampm /;
-      ($dw,$mo,$mo_num,$da,$ti,$yr) = nice_date($files{"$path_file"});
+      use vars qw/ $dw $mo $mo_num $da $ti $yr $hr $min $hr12 $ampm $tz/;
+      ($dw,$mo,$mo_num,$da,$ti,$yr,$tz) = nice_date($files{"$path_file"});
       ($hr,$min) = split /:/, $ti;
       ($hr12, $ampm) = $hr >= 12 ? ($hr - 12,'pm') : ($hr, 'am'); 
       $hr12 =~ s/^0//; $hr12 == 0 and $hr12 = 12;
@@ -443,12 +462,14 @@ sub generate {
 sub nice_date {
   my($unixtime) = @_;
   
+  POSIX::tzset();
   my $c_time = ctime($unixtime);
   my($dw,$mo,$da,$ti,$yr) = ( $c_time =~ /(\w{3}) +(\w{3}) +(\d{1,2}) +(\d{2}:\d{2}):\d{2} +(\d{4})$/ );
   $da = sprintf("%02d", $da);
   my $mo_num = $month2num{$mo};
+  my $tz = POSIX::tzname();
   
-  return ($dw,$mo,$mo_num,$da,$ti,$yr);
+  return ($dw,$mo,$mo_num,$da,$ti,$yr,$tz);
 }
 
 
@@ -481,7 +502,7 @@ html date         <h3>$dw, $da $mo $yr</h3>
 html foot
 html foot         <p />
 html foot         <center>
-html foot             <a href="http://www.blosxom.com/"><img src="http://www.blosxom.com/images/pb_blosxom.gif" border="0" /></a>
+html foot             <a href="http://www.blosxom.com/"><img src="/blosxom/pb_blosxom.gif" border="0" /></a>
 html foot         </center>
 html foot     </body>
 html foot </html>
@@ -501,6 +522,7 @@ rss head     <language>$blog_language</language>
 
 rss story   <item>
 rss story     <title>$title</title>
+rss story     <pubDate>$dw, $da $mo $yr $ti:00 $tz</pubDate>
 rss story     <link>$url/$yr/$mo_num/$da#$fn</link>
 rss story     <description>$body</description>
 rss story   </item>
