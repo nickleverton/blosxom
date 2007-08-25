@@ -3,7 +3,7 @@
 # Blosxom
 # Author: Rael Dornfest <rael@oreilly.com>
 # Version: 2.0.2
-# Home/Docs/Licensing: http://www.blosxom.com/
+# Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
 package blosxom;
@@ -481,7 +481,7 @@ html date         <h3>$dw, $da $mo $yr</h3>
 html foot
 html foot         <p />
 html foot         <center>
-html foot             <a href="http://www.blosxom.com/"><img src="http://www.blosxom.com/images/pb_blosxom.gif" border="0" /></a>
+html foot             <a href="http://blosxom.sourceforge.net/"><img src="http://blosxom.sourceforge.net/images/pb_blosxom.gif" border="0" /></a>
 html foot         </center>
 html foot     </body>
 html foot </html>
