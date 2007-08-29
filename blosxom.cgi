@@ -163,13 +163,23 @@ while (<DATA>) {
 
 # Plugins: Start
 if ( $plugin_dir and opendir PLUGINS, $plugin_dir ) {
-  foreach my $plugin ( grep { /^\w+$/ && -f "$plugin_dir/$_"  } sort readdir(PLUGINS) ) {
+  unshift @INC, $plugin_dir;
+  foreach my $plugin ( grep { /^[\w:]+$/ && -f "$plugin_dir/$_"  } sort readdir(PLUGINS) ) {
     next if ($plugin =~ /~$/);   # Ignore emacs backups
-    my($plugin_name, $off) = $plugin =~ /^\d*(\w+?)(_?)$/;
+    my($plugin_name, $off) = $plugin =~ /^\d*([\w:]+?)(_?)$/;
     my $on_off = $off eq '_' ? -1 : 1;
-    require "$plugin_dir/$plugin";
+    # Allow perl module plugins
+    if ($plugin =~ m/::/ && -z "$plugin_dir/$plugin") {
+      # For Blosxom::Plugin::Foo style plugins, we need to use a string require
+      eval "require $plugin_name";
+    }
+    else {
+      eval { require $plugin };
+    }
+    $@ and warn "error finding or loading blosxom plugin $plugin_name - skipping\n" and next;
     $plugin_name->start() and ( $plugins{$plugin_name} = $on_off ) and push @plugins, $plugin_name;
   }
+  shift @INC;
   closedir PLUGINS;
 }
 
