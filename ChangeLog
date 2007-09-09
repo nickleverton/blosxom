@@ -1,3 +1,9 @@
+v2.0.3
+    * changed plugin loading to use @INC instead of hardcoded 
+      $plugin_dir
+    * added support for external config file via BLOSXOM_CONFIG_DIR 
+      and/or BLOSXOM_CONFIG_FILE environment variables
+
 v2.0.2
 	* fixed path_info to have correct extension in static mode (bug
 	1368882)
@@ -5,6 +11,7 @@ v2.0.2
 	* changed DATA section template parsing to allow newlines for
 	greater readability, and to allow empty templates.
 	* work-around for bug in CGI::url() when using SSI
+
 v2.0.1
 	* Fixed XML escaping of RSS feeds
 	* Ignore editor backup files in the plugin directory

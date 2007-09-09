@@ -67,7 +67,7 @@ $static_entries = 0;
 
 # --------------------------------
 
-use vars qw! $version $blog_title $blog_description $blog_language $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others !;
+use vars qw! $version $blog_title $blog_description $blog_language $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others !;
 
 use strict;
 use FileHandle;
@@ -77,6 +77,32 @@ use Time::localtime;
 use CGI qw/:standard :netscape/;
 
 $version = "2.0.2";
+
+# Load configuration from $ENV{BLOSXOM_CONFIG_DIR}/blosxom.conf, if it exists
+my $blosxom_config;
+if ($ENV{BLOSXOM_CONFIG_FILE} && -r $ENV{BLOSXOM_CONFIG_FILE}) {
+  $blosxom_config = $ENV{BLOSXOM_CONFIG_FILE};
+  ($config_dir = $blosxom_config) =~ s! / [^/]* $ !!x;                          
+}
+else {
+  for my $blosxom_config_dir ($ENV{BLOSXOM_CONFIG_DIR}, '/etc/blosxom', '/etc') {
+    if (-r "$blosxom_config_dir/blosxom.conf") {
+      $config_dir = $blosxom_config_dir;
+      $blosxom_config = "$blosxom_config_dir/blosxom.conf";
+      last;
+    }
+  }
+}
+# Load $blosxom_config
+if ($blosxom_config) { 
+  if (-r $blosxom_config) {
+    eval { require $blosxom_config } or
+      warn "Error reading blosxom config file '$blosxom_config'" . ($@ ? ": $@" : '');
+  }
+  else {
+    warn "Cannot find or read blosxom config file '$blosxom_config'";
+  }
+}
 
 my $fh = new FileHandle;
 
