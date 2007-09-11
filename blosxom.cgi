@@ -44,6 +44,9 @@ $show_future_entries = 0;
 
 # --- Plugins (Optional) -----
 
+# File listing plugins blosxom should load (if empty blosxom will walk $plugin_dir)
+$plugin_list = "";
+
 # Where are my plugins kept?
 $plugin_dir = "";
 
@@ -67,7 +70,7 @@ $static_entries = 0;
 
 # --------------------------------
 
-use vars qw! $version $blog_title $blog_description $blog_language $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others !;
+use vars qw! $version $blog_title $blog_description $blog_language $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others !;
 
 use strict;
 use FileHandle;
@@ -188,26 +191,37 @@ while (<DATA>) {
 }
 
 # Plugins: Start
-if ( $plugin_dir and opendir PLUGINS, $plugin_dir ) {
-  unshift @INC, $plugin_dir;
-  foreach my $plugin ( grep { /^[\w:]+$/ && -f "$plugin_dir/$_"  } sort readdir(PLUGINS) ) {
-    next if ($plugin =~ /~$/);   # Ignore emacs backups
-    my($plugin_name, $off) = $plugin =~ /^\d*([\w:]+?)(_?)$/;
-    my $on_off = $off eq '_' ? -1 : 1;
-    # Allow perl module plugins
-    if ($plugin =~ m/::/ && -z "$plugin_dir/$plugin") {
-      # For Blosxom::Plugin::Foo style plugins, we need to use a string require
-      eval "require $plugin_name";
-    }
-    else {
-      eval { require $plugin };
-    }
-    $@ and warn "error finding or loading blosxom plugin $plugin_name - skipping\n" and next;
-    $plugin_name->start() and ( $plugins{$plugin_name} = $on_off ) and push @plugins, $plugin_name;
-  }
-  shift @INC;
+my @plugin_list = ();
+
+# If $plugin_list is set, read plugins to use from that file
+$plugin_list = "$config_dir/$plugin_list"
+  if $plugin_list && $plugin_list !~ m!^\s*/!;
+if ( $plugin_list and -r $plugin_list and $fh->open("< $plugin_list") ) {
+  @plugin_list = map { chomp $_; $_ } grep { /\S/ && ! /^#/ } <$fh>; 
+  $fh->close;
+}
+# Otherwise walk $plugin_dir to get list of plugins to use
+elsif ( $plugin_dir and opendir PLUGINS, $plugin_dir ) {
+  @plugin_list = grep { /^[\w:]+$/ && ! /~$/ && -f "$plugin_dir/$_" } sort readdir(PLUGINS);
   closedir PLUGINS;
 }
+
+unshift @INC, $plugin_dir;
+foreach my $plugin ( @plugin_list ) {
+  my($plugin_name, $off) = $plugin =~ /^\d*([\w:]+?)(_?)$/;
+  my $on_off = $off eq '_' ? -1 : 1;
+  # Allow perl module plugins
+  if ($plugin =~ m/::/ && -z "$plugin_dir/$plugin") {
+    # For Blosxom::Plugin::Foo style plugins, we need to use a string require
+    eval "require $plugin_name";
+  }
+  else {
+    eval { require $plugin };
+  }
+  $@ and warn "error finding or loading blosxom plugin $plugin_name - skipping\n" and next;
+  $plugin_name->start() and ( $plugins{$plugin_name} = $on_off ) and push @plugins, $plugin_name;
+}
+shift @INC;
 
 # Plugins: Template
 # Allow for the first encountered plugin::template subroutine to override the

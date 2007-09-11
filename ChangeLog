@@ -1,8 +1,9 @@
 v2.0.3
-    * changed plugin loading to use @INC instead of hardcoded 
-      $plugin_dir
-    * added support for external config file via BLOSXOM_CONFIG_DIR 
-      and/or BLOSXOM_CONFIG_FILE environment variables
+	* changed plugin loading to use @INC instead of hardcoded 
+	  $plugin_dir
+	* added support for external config file via BLOSXOM_CONFIG_DIR 
+	  and/or BLOSXOM_CONFIG_FILE environment variables
+	* added support for $plugin_list plugin config file
 
 v2.0.2
 	* fixed path_info to have correct extension in static mode (bug
