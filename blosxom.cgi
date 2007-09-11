@@ -564,7 +564,7 @@ error content_type text/html
 
 error head <html>
 error head <body>
-error head     <p><font color="red">Error: I'm afraid this is the first I've heard of a "$flavour" flavoured Blosxom.  Try dropping the "/+$flavour" bit from the end of the URL.</font>
+error head     <p><font color="red">Error: I'm afraid this is the first I've heard of a "$flavour" flavoured Blosxom.  Try dropping the "/+$flavour" bit from the end of the URL.</font></p>
 
 
 error story <p><b>$title</b><br />
