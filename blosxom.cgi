@@ -335,8 +335,6 @@ else {
   my $content_type = (&$template($path_info,'content_type',$flavour));
   $content_type =~ s!\n.*!!s;
 
-  $header = {-type=>$content_type};
-
   print generate('dynamic', $path_info, "$path_info_yr/$path_info_mo_num/$path_info_da", $flavour, $content_type);
 }
 
@@ -375,6 +373,10 @@ sub generate {
     # override the default built-in interpolate subroutine
     my $tmp; foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('interpolate') and defined($tmp = $plugin->interpolate()) and $interpolate = $tmp and last; }
         
+    # Content_type
+    $content_type=&$interpolate($content_type);
+    $header = {-type=>$content_type};
+
     # Head
     my $head = (&$template($currentdir,'head',$flavour));
   
