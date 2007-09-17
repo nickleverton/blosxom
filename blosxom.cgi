@@ -77,6 +77,7 @@ use FileHandle;
 use File::Find;
 use File::stat;
 use Time::localtime;
+use Time::Local;
 use CGI qw/:standard :netscape/;
 
 $version = "2.0.2";
@@ -419,8 +420,8 @@ sub generate {
       $path &&= "/$path";
 
       # Date fiddling for by-{year,month,day} archive views
-      use vars qw/ $dw $mo $mo_num $da $ti $yr $hr $min $hr12 $ampm /;
-      ($dw,$mo,$mo_num,$da,$ti,$yr) = nice_date($files{"$path_file"});
+      use vars qw/ $dw $mo $mo_num $da $ti $yr $hr $min $hr12 $ampm $utc_offset/;
+      ($dw,$mo,$mo_num,$da,$ti,$yr,$utc_offset) = nice_date($files{"$path_file"});
       ($hr,$min) = split /:/, $ti;
       ($hr12, $ampm) = $hr >= 12 ? ($hr - 12,'pm') : ($hr, 'am'); 
       $hr12 =~ s/^0//; $hr12 == 0 and $hr12 = 12;
@@ -494,11 +495,15 @@ sub nice_date {
   my($unixtime) = @_;
   
   my $c_time = ctime($unixtime);
-  my($dw,$mo,$da,$ti,$yr) = ( $c_time =~ /(\w{3}) +(\w{3}) +(\d{1,2}) +(\d{2}:\d{2}):\d{2} +(\d{4})$/ );
+  my($dw,$mo,$da,$hr,$min,$yr) = ( $c_time =~ /(\w{3}) +(\w{3}) +(\d{1,2}) +(\d{2}):(\d{2}):\d{2} +(\d{4})$/ );
+  $ti="$hr:$min";
   $da = sprintf("%02d", $da);
   my $mo_num = $month2num{$mo};
-  
-  return ($dw,$mo,$mo_num,$da,$ti,$yr);
+
+  my $offset = timegm(00, $min, $hr, $da, $mo_num-1, $yr-1900)-$unixtime;  
+  my $utc_offset = sprintf("%+03d", int($offset / 3600)).sprintf("%02d", ($offset % 3600)/60) ;
+
+  return ($dw,$mo,$mo_num,$da,$ti,$yr,$utc_offset);
 }
 
 
