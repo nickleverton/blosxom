@@ -19,6 +19,9 @@ $blog_description = "Yet another Blosxom weblog.";
 # What's this blog's primary language (for outgoing RSS feed)?
 $blog_language = "en";
 
+# What's this blog's text encoding ?
+$blog_encoding = "UTF-8";
+
 # Where are this blog's entries kept?
 $datadir = "/Library/WebServer/Documents/blosxom";
 
@@ -70,7 +73,7 @@ $static_entries = 0;
 
 # --------------------------------
 
-use vars qw! $version $blog_title $blog_description $blog_language $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others !;
+use vars qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others !;
 
 use strict;
 use FileHandle;
@@ -511,10 +514,11 @@ sub nice_date {
 
 # Default HTML and RSS template bits
 __DATA__
-html content_type text/html
+html content_type text/html; charset=$blog_encoding
 
 html head <html>
 html head     <head>
+html head         <meta http-equiv="content-type" content="text/html;charset=$blog_encoding" />
 html head         <link rel="alternate" type="type="application/rss+xml" title="RSS" href="$url/index.rss" />
 html head         <title>$blog_title $path_info_da $path_info_mo $path_info_yr
 html head         </title>
@@ -543,22 +547,24 @@ html foot         </center>
 html foot     </body>
 html foot </html>
 
-rss content_type text/xml
+rss content_type text/xml ; charset=$blog_encoding
 
-rss head <?xml version="1.0"?>
-rss head <!-- name="generator" content="blosxom/$version" -->
-rss head <!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN" "http://my.netscape.com/publish/formats/rss-0.91.dtd">
-rss head 
-rss head <rss version="0.91">
+rss head <?xml version="1.0" encoding="$blog_encoding"?>
+rss head <rss version="2.0">
 rss head   <channel>
-rss head     <title>$blog_title $path_info_da $path_info_mo $path_info_yr</title>
-rss head     <link>$url</link>
+rss head     <title>$blog_title</title>
+rss head     <link>$url/$path_info</link>
 rss head     <description>$blog_description</description>
 rss head     <language>$blog_language</language>
+rss head     <docs>http://blogs.law.harvard.edu/tech/rss</docs>
+rss head     <generator>blosxom/$version</generator>
 
 rss story   <item>
 rss story     <title>$title</title>
+rss story     <pubDate>$dw, $da $mo $yr $ti:00 $utc_offset</pubDate>
 rss story     <link>$url/$yr/$mo_num/$da#$fn</link>
+rss story     <category>$path</category>
+rss story     <guid isPermaLink="false">$path/$fn</guid>
 rss story     <description>$body</description>
 rss story   </item>
 
