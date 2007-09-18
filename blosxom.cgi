@@ -47,14 +47,17 @@ $show_future_entries = 0;
 
 # --- Plugins (Optional) -----
 
-# File listing plugins blosxom should load (if empty blosxom will walk $plugin_dir)
+# File listing plugins blosxom should load 
+# (if empty blosxom will load all plugins in $plugin_path directories)
 $plugin_list = "";
 
-# Where are my plugins kept?
-$plugin_dir = "";
+# Where are my plugins kept? 
+# List of directories, separated by ';' on windows, ':' everywhere else
+$plugin_path = "";
 
-# Where should my modules keep their state information?
-$plugin_state_dir = "$plugin_dir/state";
+# Where should my plugins keep their state information?
+$plugin_state_dir = "";
+#$plugin_state_dir = "/var/lib/blosxom/state";
 
 # --- Static Rendering -----
 
@@ -73,7 +76,7 @@ $static_entries = 0;
 
 # --------------------------------
 
-use vars qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others !;
+use vars qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others !;
 
 use strict;
 use FileHandle;
@@ -195,7 +198,10 @@ while (<DATA>) {
 }
 
 # Plugins: Start
+my $path_sep = $^O eq 'MSWin32' ? ';' : ':';
+my @plugin_dirs = split /$path_sep/, ($plugin_path || $plugin_dir);
 my @plugin_list = ();
+my %plugin_hash = ();
 
 # If $plugin_list is set, read plugins to use from that file
 $plugin_list = "$config_dir/$plugin_list"
@@ -204,18 +210,31 @@ if ( $plugin_list and -r $plugin_list and $fh->open("< $plugin_list") ) {
   @plugin_list = map { chomp $_; $_ } grep { /\S/ && ! /^#/ } <$fh>; 
   $fh->close;
 }
-# Otherwise walk $plugin_dir to get list of plugins to use
-elsif ( $plugin_dir and opendir PLUGINS, $plugin_dir ) {
-  @plugin_list = grep { /^[\w:]+$/ && ! /~$/ && -f "$plugin_dir/$_" } sort readdir(PLUGINS);
-  closedir PLUGINS;
+# Otherwise walk @plugin_dirs to get list of plugins to use
+elsif ( @plugin_dirs ) {
+  for my $plugin_dir ( @plugin_dirs ) {
+    next unless -d $plugin_dir;
+    if ( opendir PLUGINS, $plugin_dir ) {
+      for my $plugin ( grep { /^[\w:]+$/ && ! /~$/ && -f "$plugin_dir/$_" } readdir(PLUGINS) ) {
+        # Ignore duplicates
+        next if $plugin_hash{ $plugin };
+        # Add to @plugin_list and %plugin_hash
+        $plugin_hash{ $plugin } = "$plugin_dir/$plugin";
+        push @plugin_list, $plugin;
+      }
+      closedir PLUGINS;
+    }
+  }
+  @plugin_list = sort @plugin_list;
 }
 
-unshift @INC, $plugin_dir;
+# Load all plugins in @plugin_list
+unshift @INC, @plugin_dirs;
 foreach my $plugin ( @plugin_list ) {
   my($plugin_name, $off) = $plugin =~ /^\d*([\w:]+?)(_?)$/;
   my $on_off = $off eq '_' ? -1 : 1;
   # Allow perl module plugins
-  if ($plugin =~ m/::/ && -z "$plugin_dir/$plugin") {
+  if ($plugin =~ m/::/ && -z $plugin_hash{ $plugin }) {
     # For Blosxom::Plugin::Foo style plugins, we need to use a string require
     eval "require $plugin_name";
   }
@@ -225,7 +244,7 @@ foreach my $plugin ( @plugin_list ) {
   $@ and warn "error finding or loading blosxom plugin $plugin_name - skipping\n" and next;
   $plugin_name->start() and ( $plugins{$plugin_name} = $on_off ) and push @plugins, $plugin_name;
 }
-shift @INC;
+shift @INC foreach @plugin_dirs;
 
 # Plugins: Template
 # Allow for the first encountered plugin::template subroutine to override the
