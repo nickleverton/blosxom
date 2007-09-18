@@ -338,6 +338,8 @@ else {
   my $content_type = (&$template($path_info,'content_type',$flavour));
   $content_type =~ s!\n.*!!s;
 
+  $header = {-type=>$content_type};
+
   print generate('dynamic', $path_info, "$path_info_yr/$path_info_mo_num/$path_info_da", $flavour, $content_type);
 }
 
@@ -376,10 +378,6 @@ sub generate {
     # override the default built-in interpolate subroutine
     my $tmp; foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('interpolate') and defined($tmp = $plugin->interpolate()) and $interpolate = $tmp and last; }
         
-    # Content_type
-    $content_type=&$interpolate($content_type);
-    $header = {-type=>$content_type};
-
     # Head
     my $head = (&$template($currentdir,'head',$flavour));
   
@@ -514,7 +512,7 @@ sub nice_date {
 
 # Default HTML and RSS template bits
 __DATA__
-html content_type text/html; charset=$blog_encoding
+html content_type text/html
 
 html head <html>
 html head     <head>
@@ -547,7 +545,7 @@ html foot         </center>
 html foot     </body>
 html foot </html>
 
-rss content_type text/xml ; charset=$blog_encoding
+rss content_type text/xml
 
 rss head <?xml version="1.0" encoding="$blog_encoding"?>
 rss head <rss version="2.0">
