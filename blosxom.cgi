@@ -338,6 +338,7 @@ else {
   my $content_type = (&$template($path_info,'content_type',$flavour));
   $content_type =~ s!\n.*!!s;
 
+  $content_type =~ s/(\$\w+(?:::)?\w*)/"defined $1 ? $1 : ''"/gee;
   $header = {-type=>$content_type};
 
   print generate('dynamic', $path_info, "$path_info_yr/$path_info_mo_num/$path_info_da", $flavour, $content_type);
@@ -512,7 +513,7 @@ sub nice_date {
 
 # Default HTML and RSS template bits
 __DATA__
-html content_type text/html
+html content_type text/html; charset=$blog_encoding
 
 html head <html>
 html head     <head>
@@ -545,7 +546,7 @@ html foot         </center>
 html foot     </body>
 html foot </html>
 
-rss content_type text/xml
+rss content_type text/xml; charset=$blog_encoding
 
 rss head <?xml version="1.0" encoding="$blog_encoding"?>
 rss head <rss version="2.0">
