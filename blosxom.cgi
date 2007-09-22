@@ -453,7 +453,7 @@ sub generate {
 
     if ( $currentdir =~ /(.*?)([^\/]+)\.(.+)$/ and $2 ne 'index' ) {
       $currentdir = "$1$2.$file_extension";
-      $files{"$datadir/$1$2.$file_extension"} and %f = ( "$datadir/$1$2.$file_extension" => $files{"$datadir/$1$2.$file_extension"} );
+      %f = ( "$datadir/$currentdir" => $files{"$datadir/$currentdir"} ) if $files{"$datadir/$currentdir"};
     } 
     else { 
       $currentdir =~ s!/index\..+$!!;
