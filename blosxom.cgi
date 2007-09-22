@@ -47,16 +47,17 @@ $show_future_entries = 0;
 
 # --- Plugins (Optional) -----
 
-# File listing plugins blosxom should load 
+# File listing plugins blosxom should load
 # (if empty blosxom will load all plugins in $plugin_path directories)
 $plugin_list = "";
 
-# Where are my plugins kept? 
+# Where are my plugins kept?
 # List of directories, separated by ';' on windows, ':' everywhere else
 $plugin_path = "";
 
 # Where should my plugins keep their state information?
 $plugin_state_dir = "";
+
 #$plugin_state_dir = "/var/lib/blosxom/state";
 
 # --- Static Rendering -----
@@ -76,7 +77,8 @@ $static_entries = 0;
 
 # --------------------------------
 
-use vars qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others !;
+use vars
+    qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others !;
 
 use strict;
 use FileHandle;
@@ -90,37 +92,55 @@ $version = "2.0.2";
 
 # Load configuration from $ENV{BLOSXOM_CONFIG_DIR}/blosxom.conf, if it exists
 my $blosxom_config;
-if ($ENV{BLOSXOM_CONFIG_FILE} && -r $ENV{BLOSXOM_CONFIG_FILE}) {
-  $blosxom_config = $ENV{BLOSXOM_CONFIG_FILE};
-  ($config_dir = $blosxom_config) =~ s! / [^/]* $ !!x;                          
+if ( $ENV{BLOSXOM_CONFIG_FILE} && -r $ENV{BLOSXOM_CONFIG_FILE} ) {
+    $blosxom_config = $ENV{BLOSXOM_CONFIG_FILE};
+    ( $config_dir = $blosxom_config ) =~ s! / [^/]* $ !!x;
 }
 else {
-  for my $blosxom_config_dir ($ENV{BLOSXOM_CONFIG_DIR}, '/etc/blosxom', '/etc') {
-    if (-r "$blosxom_config_dir/blosxom.conf") {
-      $config_dir = $blosxom_config_dir;
-      $blosxom_config = "$blosxom_config_dir/blosxom.conf";
-      last;
+    for my $blosxom_config_dir ( $ENV{BLOSXOM_CONFIG_DIR}, '/etc/blosxom',
+        '/etc' )
+    {
+        if ( -r "$blosxom_config_dir/blosxom.conf" ) {
+            $config_dir     = $blosxom_config_dir;
+            $blosxom_config = "$blosxom_config_dir/blosxom.conf";
+            last;
+        }
     }
-  }
 }
+
 # Load $blosxom_config
-if ($blosxom_config) { 
-  if (-r $blosxom_config) {
-    eval { require $blosxom_config } or
-      warn "Error reading blosxom config file '$blosxom_config'" . ($@ ? ": $@" : '');
-  }
-  else {
-    warn "Cannot find or read blosxom config file '$blosxom_config'";
-  }
+if ($blosxom_config) {
+    if ( -r $blosxom_config ) {
+        eval { require $blosxom_config }
+            or warn "Error reading blosxom config file '$blosxom_config'"
+            . ( $@ ? ": $@" : '' );
+    }
+    else {
+        warn "Cannot find or read blosxom config file '$blosxom_config'";
+    }
 }
 
 my $fh = new FileHandle;
 
-%month2num = (nil=>'00', Jan=>'01', Feb=>'02', Mar=>'03', Apr=>'04', May=>'05', Jun=>'06', Jul=>'07', Aug=>'08', Sep=>'09', Oct=>'10', Nov=>'11', Dec=>'12');
+%month2num = (
+    nil => '00',
+    Jan => '01',
+    Feb => '02',
+    Mar => '03',
+    Apr => '04',
+    May => '05',
+    Jun => '06',
+    Jul => '07',
+    Aug => '08',
+    Sep => '09',
+    Oct => '10',
+    Nov => '11',
+    Dec => '12'
+);
 @num2month = sort { $month2num{$a} <=> $month2num{$b} } keys %month2num;
 
 # Use the stated preferred URL or figure it out automatically
-$url ||= url(-path_info => 1);
+$url ||= url( -path_info => 1 );
 $url =~ s/^included:/http:/ if $ENV{SERVER_PROTOCOL} eq 'INCLUDED';
 
 # NOTE: Since v3.12, it looks as if CGI.pm misbehaves for SSIs and
@@ -128,16 +148,19 @@ $url =~ s/^included:/http:/ if $ENV{SERVER_PROTOCOL} eq 'INCLUDED';
 # request an url with path_info, and always remove it from the end of the
 # string.
 my $pi_len = length $ENV{PATH_INFO};
-my $might_be_pi = substr($url, -$pi_len);
-substr($url, -length $ENV{PATH_INFO}) = '' if $might_be_pi eq $ENV{PATH_INFO};
+my $might_be_pi = substr( $url, -$pi_len );
+substr( $url, -length $ENV{PATH_INFO} ) = ''
+    if $might_be_pi eq $ENV{PATH_INFO};
 
 $url =~ s!/$!!;
 
 # Drop ending any / from dir settings
-$datadir =~ s!/$!!; $plugin_dir =~ s!/$!!; $static_dir =~ s!/$!!;
-  
+$datadir    =~ s!/$!!;
+$plugin_dir =~ s!/$!!;
+$static_dir =~ s!/$!!;
+
 # Fix depth to take into account datadir's path
-$depth += ($datadir =~ tr[/][]) - 1 if $depth;
+$depth += ( $datadir =~ tr[/][] ) - 1 if $depth;
 
 # Global variable to be used in head/foot.{flavour} templates
 $path_info = '';
@@ -156,108 +179,130 @@ else {
 
 # Path Info Magic
 # Take a gander at HTTP's PATH_INFO for optional blog name, archive yr/mo/day
-my @path_info = split m{/}, path_info() || param('path'); 
+my @path_info = split m{/}, path_info() || param('path');
 shift @path_info;
 
-while ($path_info[0] and $path_info[0] =~ /^[a-zA-Z].*$/ and $path_info[0] !~ /(.*)\.(.*)/) { $path_info .= '/' . shift @path_info; }
+while ( $path_info[0]
+    and $path_info[0] =~ /^[a-zA-Z].*$/
+    and $path_info[0] !~ /(.*)\.(.*)/ )
+{
+    $path_info .= '/' . shift @path_info;
+}
 
 # Flavour specified by ?flav={flav} or index.{flav}
 $flavour = '';
 
 if ( $path_info[$#path_info] =~ /(.+)\.(.+)$/ ) {
-  $flavour = $2;
-  $path_info .= "/$1.$2" if $1 ne 'index';
-  pop @path_info;
-} else {
-  $flavour = param('flav') || $default_flavour;
+    $flavour = $2;
+    $path_info .= "/$1.$2" if $1 ne 'index';
+    pop @path_info;
+}
+else {
+    $flavour = param('flav') || $default_flavour;
 }
 
 # Strip spurious slashes
 $path_info =~ s!(^/*)|(/*$)!!g;
 
 # Date fiddling
-($path_info_yr,$path_info_mo,$path_info_da) = @path_info;
-$path_info_mo_num = $path_info_mo ? ( $path_info_mo =~ /\d{2}/ ? $path_info_mo : ($month2num{ucfirst(lc $path_info_mo)} || undef) ) : undef;
+( $path_info_yr, $path_info_mo, $path_info_da ) = @path_info;
+$path_info_mo_num
+    = $path_info_mo
+    ? ( $path_info_mo =~ /\d{2}/
+    ? $path_info_mo
+    : ( $month2num{ ucfirst( lc $path_info_mo ) } || undef ) )
+    : undef;
 
 # Define standard template subroutine, plugin-overridable at Plugins: Template
-$template = 
-  sub {
-    my ($path, $chunk, $flavour) = @_;
+$template = sub {
+    my ( $path, $chunk, $flavour ) = @_;
 
     do {
-      return join '', <$fh> if $fh->open("< $datadir/$path/$chunk.$flavour");
-    } while ($path =~ s/(\/*[^\/]*)$// and $1);
+        return join '', <$fh>
+            if $fh->open("< $datadir/$path/$chunk.$flavour");
+    } while ( $path =~ s/(\/*[^\/]*)$// and $1 );
 
     # Check for definedness, since flavour can be the empty string
-    if (defined $template{$flavour}{$chunk}) {
-	return $template{$flavour}{$chunk};
-    } elsif (defined $template{error}{$chunk}) {
-	return $template{error}{$chunk} 
-    } else {
-	return '';
+    if ( defined $template{$flavour}{$chunk} ) {
+        return $template{$flavour}{$chunk};
     }
-  };
+    elsif ( defined $template{error}{$chunk} ) {
+        return $template{error}{$chunk};
+    }
+    else {
+        return '';
+    }
+};
+
 # Bring in the templates
 %template = ();
 while (<DATA>) {
-  last if /^(__END__)$/;
-  my($ct, $comp, $txt) = /^(\S+)\s(\S+)(?:\s(.*))?$/ or next;
-  $txt =~ s/\\n/\n/mg;
-  $template{$ct}{$comp} .= $txt . "\n";
+    last if /^(__END__)$/;
+    my ( $ct, $comp, $txt ) = /^(\S+)\s(\S+)(?:\s(.*))?$/ or next;
+    $txt =~ s/\\n/\n/mg;
+    $template{$ct}{$comp} .= $txt . "\n";
 }
 
 # Plugins: Start
 my $path_sep = $^O eq 'MSWin32' ? ';' : ':';
-my @plugin_dirs = split /$path_sep/, ($plugin_path || $plugin_dir);
+my @plugin_dirs = split /$path_sep/, ( $plugin_path || $plugin_dir );
 my @plugin_list = ();
 my %plugin_hash = ();
 
 # If $plugin_list is set, read plugins to use from that file
 $plugin_list = "$config_dir/$plugin_list"
-  if $plugin_list && $plugin_list !~ m!^\s*/!;
+    if $plugin_list && $plugin_list !~ m!^\s*/!;
 if ( $plugin_list and -r $plugin_list and $fh->open("< $plugin_list") ) {
-  @plugin_list = map { chomp $_; $_ } grep { /\S/ && ! /^#/ } <$fh>; 
-  $fh->close;
+    @plugin_list = map { chomp $_; $_ } grep { /\S/ && !/^#/ } <$fh>;
+    $fh->close;
 }
+
 # Otherwise walk @plugin_dirs to get list of plugins to use
-elsif ( @plugin_dirs ) {
-  for my $plugin_dir ( @plugin_dirs ) {
-    next unless -d $plugin_dir;
-    if ( opendir PLUGINS, $plugin_dir ) {
-      for my $plugin ( grep { /^[\w:]+$/ && ! /~$/ && -f "$plugin_dir/$_" } readdir(PLUGINS) ) {
-        # Ignore duplicates
-        next if $plugin_hash{ $plugin };
-        # Add to @plugin_list and %plugin_hash
-        $plugin_hash{ $plugin } = "$plugin_dir/$plugin";
-        push @plugin_list, $plugin;
-      }
-      closedir PLUGINS;
+elsif (@plugin_dirs) {
+    for my $plugin_dir (@plugin_dirs) {
+        next unless -d $plugin_dir;
+        if ( opendir PLUGINS, $plugin_dir ) {
+            for my $plugin (
+                grep { /^[\w:]+$/ && !/~$/ && -f "$plugin_dir/$_" }
+                readdir(PLUGINS) )
+            {
+
+                # Ignore duplicates
+                next if $plugin_hash{$plugin};
+
+                # Add to @plugin_list and %plugin_hash
+                $plugin_hash{$plugin} = "$plugin_dir/$plugin";
+                push @plugin_list, $plugin;
+            }
+            closedir PLUGINS;
+        }
     }
-  }
-  @plugin_list = sort @plugin_list;
+    @plugin_list = sort @plugin_list;
 }
 
 # Load all plugins in @plugin_list
 unshift @INC, @plugin_dirs;
-foreach my $plugin ( @plugin_list ) {
-  my($plugin_name, $off) = $plugin =~ /^\d*([\w:]+?)(_?)$/;
-  my $on_off = $off eq '_' ? -1 : 1;
-  # Allow perl module plugins
-  if ($plugin =~ m/::/ && -z $plugin_hash{ $plugin }) {
-    # For Blosxom::Plugin::Foo style plugins, we need to use a string require
-    eval "require $plugin_name";
-  }
-  else {
-    eval { require $plugin };
-  }
+foreach my $plugin (@plugin_list) {
+    my ( $plugin_name, $off ) = $plugin =~ /^\d*([\w:]+?)(_?)$/;
+    my $on_off = $off eq '_' ? -1 : 1;
 
-  if ($@) {
-      warn "error finding or loading blosxom plugin '$plugin_name': $@";
-      next;
-  }
-  if ( $plugin_name->start() and ( $plugins{$plugin_name} = $on_off ) ) {
-      push @plugins, $plugin_name;
-  }
+    # Allow perl module plugins
+    if ( $plugin =~ m/::/ && -z $plugin_hash{$plugin} ) {
+
+     # For Blosxom::Plugin::Foo style plugins, we need to use a string require
+        eval "require $plugin_name";
+    }
+    else {
+        eval { require $plugin };
+    }
+
+    if ($@) {
+        warn "error finding or loading blosxom plugin '$plugin_name': $@";
+        next;
+    }
+    if ( $plugin_name->start() and ( $plugins{$plugin_name} = $on_off ) ) {
+        push @plugins, $plugin_name;
+    }
 
 }
 shift @INC foreach @plugin_dirs;
@@ -276,57 +321,63 @@ foreach my $plugin (@plugins) {
 
 # Provide backward compatibility for Blosxom < 2.0rc1 plug-ins
 sub load_template {
-  return &$template(@_);
+    return &$template(@_);
 }
 
 # Define default entries subroutine
-$entries =
-  sub {
-    my(%files, %indexes, %others);
+$entries = sub {
+    my ( %files, %indexes, %others );
     find(
-      sub {
-        my $d; 
-        my $curr_depth = $File::Find::dir =~ tr[/][]; 
-        return if $depth and $curr_depth > $depth; 
-     
-        if ( 
-          # a match
-          $File::Find::name =~ m!^$datadir/(?:(.*)/)?(.+)\.$file_extension$!
-          # not an index, .file, and is readable
-          and $2 ne 'index' and $2 !~ /^\./ and (-r $File::Find::name)
-        ) {
-            # read modification time
-            my $mtime = stat($File::Find::name)->mtime or return;
+        sub {
+            my $d;
+            my $curr_depth = $File::Find::dir =~ tr[/][];
+            return if $depth and $curr_depth > $depth;
 
+            if (
 
-            # to show or not to show future entries
-            return unless ($show_future_entries or $mtime < time);
+                # a match
+                $File::Find::name
+                =~ m!^$datadir/(?:(.*)/)?(.+)\.$file_extension$!
 
-              # add the file and its associated mtime to the list of files
-            $files{$File::Find::name} = $mtime;
+                # not an index, .file, and is readable
+                and $2 ne 'index' and $2 !~ /^\./ and ( -r $File::Find::name )
+                )
+            {
+
+                # read modification time
+                my $mtime = stat($File::Find::name)->mtime or return;
+
+                # to show or not to show future entries
+                return unless ( $show_future_entries or $mtime < time );
+
+                # add the file and its associated mtime to the list of files
+                $files{$File::Find::name} = $mtime;
 
                 # static rendering bits
-            my $static_file = "$static_dir/$1/index." . $static_flavours[0];
-            if (param('-all')
-                or !-f $static_file
-                or stat($static_file)->mtime < $mtime)
-             {
-              $indexes{$1} = 1;
-              $d = join('/', (nice_date($mtime))[5,2,3]);
-              $indexes{$d} = $d;
-              $indexes{ ($1 ? "$1/" : '') . "$2.$file_extension" } = 1 if $static_entries;
-              }
-          }
-          # not an entries match
-          elsif (!-d $File::Find::name and -r $File::Find::name)
-          {
-            $others{$File::Find::name} = stat($File::Find::name)->mtime;
-          }
-      }, $datadir
+                my $static_file
+                    = "$static_dir/$1/index." . $static_flavours[0];
+                if (   param('-all')
+                    or !-f $static_file
+                    or stat($static_file)->mtime < $mtime )
+                {
+                    $indexes{$1} = 1;
+                    $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
+                    $indexes{$d} = $d;
+                    $indexes{ ( $1 ? "$1/" : '' ) . "$2.$file_extension" } = 1
+                        if $static_entries;
+                }
+            }
+
+            # not an entries match
+            elsif ( !-d $File::Find::name and -r $File::Find::name ) {
+                $others{$File::Find::name} = stat($File::Find::name)->mtime;
+            }
+        },
+        $datadir
     );
 
-    return (\%files, \%indexes, \%others);
-  };
+    return ( \%files, \%indexes, \%others );
+};
 
 # Plugins: Entries
 # Allow for the first encountered plugin::entries subroutine to override the
@@ -340,58 +391,75 @@ foreach my $plugin (@plugins) {
     }
 }
 
-my ($files, $indexes, $others) = &$entries();
+my ( $files, $indexes, $others ) = &$entries();
 %indexes = %$indexes;
 
 # Static
-if (!$ENV{GATEWAY_INTERFACE} and param('-password') and $static_password and param('-password') eq $static_password) {
+if (    !$ENV{GATEWAY_INTERFACE}
+    and param('-password')
+    and $static_password
+    and param('-password') eq $static_password )
+{
 
-  param('-quiet') or print "Blosxom is generating static index pages...\n";
+    param('-quiet') or print "Blosxom is generating static index pages...\n";
 
-  # Home Page and Directory Indexes
-  my %done;
-  foreach my $path ( sort keys %indexes) {
-    my $p = '';
-    foreach ( ('', split /\//, $path) ) {
-      $p .= "/$_";
-      $p =~ s!^/!!;
-      next if $done{$p}++;
-      mkdir "$static_dir/$p", 0755 unless (-d "$static_dir/$p" or $p =~ /\.$file_extension$/);
-      foreach $flavour ( @static_flavours ) {
-        my $content_type = (&$template($p,'content_type',$flavour));
-        $content_type =~ s!\n.*!!s;
-        my $fn = $p =~ m!^(.+)\.$file_extension$! ? $1 : "$p/index";
-        param('-quiet') or print "$fn.$flavour\n";
-        my $fh_w = new FileHandle "> $static_dir/$fn.$flavour" or die "Couldn't open $static_dir/$p for writing: $!";  
-        $output = '';
-        if ($indexes{$path} == 1) {
-          # category
-          $path_info = $p;
-          # individual story
-          $path_info =~ s!\.$file_extension$!\.$flavour!;
-          print $fh_w &generate('static', $path_info, '', $flavour, $content_type);
-        } else {
-          # date
-          local ($path_info_yr,$path_info_mo,$path_info_da, $path_info) = 
-              split /\//, $p, 4;
-          unless (defined $path_info) {$path_info = ""};
-          print $fh_w &generate('static', '', $p, $flavour, $content_type);
+    # Home Page and Directory Indexes
+    my %done;
+    foreach my $path ( sort keys %indexes ) {
+        my $p = '';
+        foreach ( ( '', split /\//, $path ) ) {
+            $p .= "/$_";
+            $p =~ s!^/!!;
+            next if $done{$p}++;
+            mkdir "$static_dir/$p", 0755
+                unless ( -d "$static_dir/$p" or $p =~ /\.$file_extension$/ );
+            foreach $flavour (@static_flavours) {
+                my $content_type
+                    = ( &$template( $p, 'content_type', $flavour ) );
+                $content_type =~ s!\n.*!!s;
+                my $fn = $p =~ m!^(.+)\.$file_extension$! ? $1 : "$p/index";
+                param('-quiet') or print "$fn.$flavour\n";
+                my $fh_w = new FileHandle "> $static_dir/$fn.$flavour"
+                    or die "Couldn't open $static_dir/$p for writing: $!";
+                $output = '';
+                if ( $indexes{$path} == 1 ) {
+
+                    # category
+                    $path_info = $p;
+
+                    # individual story
+                    $path_info =~ s!\.$file_extension$!\.$flavour!;
+                    print $fh_w &generate( 'static', $path_info, '', $flavour,
+                        $content_type );
+                }
+                else {
+
+                    # date
+                    local (
+                        $path_info_yr, $path_info_mo,
+                        $path_info_da, $path_info
+                    ) = split /\//, $p, 4;
+                    unless ( defined $path_info ) { $path_info = "" }
+                    print $fh_w &generate( 'static', '', $p, $flavour,
+                        $content_type );
+                }
+                $fh_w->close;
+            }
         }
-        $fh_w->close;
-      }
     }
-  }
 }
 
 # Dynamic
 else {
-  my $content_type = (&$template($path_info,'content_type',$flavour));
-  $content_type =~ s!\n.*!!s;
+    my $content_type = ( &$template( $path_info, 'content_type', $flavour ) );
+    $content_type =~ s!\n.*!!s;
 
-  $content_type =~ s/(\$\w+(?:::)?\w*)/"defined $1 ? $1 : ''"/gee;
-  $header = {-type=>$content_type};
+    $content_type =~ s/(\$\w+(?:::)?\w*)/"defined $1 ? $1 : ''"/gee;
+    $header = { -type => $content_type };
 
-  print generate('dynamic', $path_info, "$path_info_yr/$path_info_mo_num/$path_info_da", $flavour, $content_type);
+    print generate( 'dynamic', $path_info,
+        "$path_info_yr/$path_info_mo_num/$path_info_da",
+        $flavour, $content_type );
 }
 
 # Plugins: End
