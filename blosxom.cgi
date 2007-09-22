@@ -388,7 +388,11 @@ else {
 }
 
 # Plugins: End
-foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('end') and $entries = $plugin->end() }
+foreach my $plugin (@plugins) {
+    if ( $plugins{$plugin} > 0 and $plugin->can('end') ) {
+        $entries = $plugin->end();
+    }
+}
 
 # Generate 
 sub generate {
