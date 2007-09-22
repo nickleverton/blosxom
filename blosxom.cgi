@@ -449,7 +449,14 @@ sub generate {
     # Plugins: Sort
     # Allow for the first encountered plugin::sort subroutine to override the
     # default built-in sort subroutine
-    my $tmp; foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('sort') and defined($tmp = $plugin->sort()) and $sort = $tmp and last; }
+    foreach my $plugin (@plugins) {
+        if ( $plugins{$plugin} > 0 and $plugin->can('sort') ) {
+            if ( my $tmp = $plugin->sort() ) {
+                $sort = $tmp;
+                last;
+            }
+        }
+    }
   
     foreach my $path_file ( &$sort(\%f, \%others) ) {
       last if $ne <= 0 && $date !~ /\d/;
