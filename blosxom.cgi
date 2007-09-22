@@ -515,7 +515,10 @@ sub generate {
   
       $date = &$interpolate($date);
   
-      $curdate ne $date and $curdate = $date and $output .= $date;
+      if ( $date && $curdate ne $date ) {
+          $curdate = $date;
+          $output .= $date;
+      }
       
       use vars qw/ $title $body $raw /;
       if (-f "$path_file" && $fh->open("< $path_file")) {
