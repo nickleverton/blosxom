@@ -504,7 +504,7 @@ sub generate {
       ($dw,$mo,$mo_num,$da,$ti,$yr,$utc_offset) = nice_date($files{"$path_file"});
       ($hr,$min) = split /:/, $ti;
       ($hr12, $ampm) = $hr >= 12 ? ($hr - 12,'pm') : ($hr, 'am'); 
-      $hr12 =~ s/^0//; $hr12 == 0 and $hr12 = 12;
+      $hr12 =~ s/^0//; if ($hr12 == 0) {$hr12 = 12};
   
       # Only stories from the right date
       my($path_info_yr,$path_info_mo_num, $path_info_da) = split /\//, $date;
