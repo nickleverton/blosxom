@@ -390,7 +390,9 @@ sub generate {
   %files = %$files; %others = ref $others ? %$others : ();
 
   # Plugins: Filter
-  foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('filter') and $entries = $plugin->filter(\%files, \%others) }
+  foreach my $plugin ( @plugins ) {
+  if ($plugins{$plugin} > 0 and $plugin->can('filter')){ $entries = $plugin->filter(\%files, \%others); }
+  }
 
   my %f = %files;
 
