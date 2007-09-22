@@ -528,7 +528,11 @@ sub generate {
     my $foot = (&$template($currentdir,'foot',$flavour));
   
     # Plugins: Foot
-    foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('foot') and $entries = $plugin->foot($currentdir, \$foot) }
+    foreach my $plugin (@plugins) {
+        if ( $plugins{$plugin} > 0 and $plugin->can('foot') ) {
+            $entries = $plugin->foot( $currentdir, \$foot );
+        }
+    }
   
     $foot = &$interpolate($foot);
     $output .= $foot;
