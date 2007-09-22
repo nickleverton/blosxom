@@ -250,8 +250,15 @@ foreach my $plugin ( @plugin_list ) {
   else {
     eval { require $plugin };
   }
-  $@ and warn "$@ error finding or loading blosxom plugin $plugin_name - skipping\n" and next;
-  $plugin_name->start() and ( $plugins{$plugin_name} = $on_off ) and push @plugins, $plugin_name;
+
+  if ($@) {
+      warn "error finding or loading blosxom plugin '$plugin_name': $@";
+      next;
+  }
+  if ( $plugin_name->start() and ( $plugins{$plugin_name} = $on_off ) ) {
+      push @plugins, $plugin_name;
+  }
+
 }
 shift @INC foreach @plugin_dirs;
 
