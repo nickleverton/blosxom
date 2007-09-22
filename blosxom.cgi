@@ -281,32 +281,33 @@ $entries =
           # not an index, .file, and is readable
           and $2 ne 'index' and $2 !~ /^\./ and (-r $File::Find::name)
         ) {
+            # read modification time
+            my $mtime = stat($File::Find::name)->mtime or return;
+
 
             # to show or not to show future entries
-            ( 
-              $show_future_entries
-              or stat($File::Find::name)->mtime < time 
-            )
+            return unless ($show_future_entries or $mtime < time);
 
               # add the file and its associated mtime to the list of files
-              and $files{$File::Find::name} = stat($File::Find::name)->mtime
+            $files{$File::Find::name} = $mtime;
 
                 # static rendering bits
-                and (
-                  param('-all') 
-                  or !-f "$static_dir/$1/index." . $static_flavours[0]
-                  or stat("$static_dir/$1/index." . $static_flavours[0])->mtime < stat($File::Find::name)->mtime
-                )
-                  and $indexes{$1} = 1
-                    and $d = join('/', (nice_date($files{$File::Find::name}))[5,2,3])
-  
-                      and $indexes{$d} = $d
-                        and $static_entries and $indexes{ ($1 ? "$1/" : '') . "$2.$file_extension" } = 1
-
-            } 
-            else {
-              !-d $File::Find::name and -r $File::Find::name and $others{$File::Find::name} = stat($File::Find::name)->mtime
-            }
+            my $static_file = "$static_dir/$1/index." . $static_flavours[0];
+            if (param('-all')
+                or !-f $static_file
+                or stat($static_file)->mtime < $mtime)
+             {
+              $indexes{$1} = 1;
+              $d = join('/', (nice_date($mtime))[5,2,3]);
+              $indexes{$d} = $d;
+              $indexes{ ($1 ? "$1/" : '') . "$2.$file_extension" } = 1 if $static_entries;
+              }
+          }
+          # not an entries match
+          elsif (!-d $File::Find::name and -r $File::Find::name)
+          {
+            $others{$File::Find::name} = stat($File::Find::name)->mtime;
+          }
       }, $datadir
     );
 
