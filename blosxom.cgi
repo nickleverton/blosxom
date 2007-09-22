@@ -324,8 +324,8 @@ if (!$ENV{GATEWAY_INTERFACE} and param('-password') and $static_password and par
     foreach ( ('', split /\//, $path) ) {
       $p .= "/$_";
       $p =~ s!^/!!;
-      $done{$p}++ and next;
-      (-d "$static_dir/$p" or $p =~ /\.$file_extension$/) or mkdir "$static_dir/$p", 0755;
+      next if $done{$p}++;
+      mkdir "$static_dir/$p", 0755 unless (-d "$static_dir/$p" or $p =~ /\.$file_extension$/);
       foreach $flavour ( @static_flavours ) {
         my $content_type = (&$template($p,'content_type',$flavour));
         $content_type =~ s!\n.*!!s;
