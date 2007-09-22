@@ -142,8 +142,17 @@ $depth += ($datadir =~ tr[/][]) - 1 if $depth;
 # Global variable to be used in head/foot.{flavour} templates
 $path_info = '';
 
-$static_or_dynamic = (!$ENV{GATEWAY_INTERFACE} and param('-password') and $static_password and param('-password') eq $static_password) ? 'static' : 'dynamic';
-$static_or_dynamic eq 'dynamic' and param(-name=>'-quiet', -value=>1);
+if (    !$ENV{GATEWAY_INTERFACE}
+    and param('-password')
+    and $static_password
+    and param('-password') eq $static_password )
+{
+    $static_or_dynamic = 'static';
+}
+else {
+    $static_or_dynamic = 'dynamic';
+    param( -name => '-quiet', -value => 1 );
+}
 
 # Path Info Magic
 # Take a gander at HTTP's PATH_INFO for optional blog name, archive yr/mo/day
