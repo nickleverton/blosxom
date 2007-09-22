@@ -469,219 +469,245 @@ foreach my $plugin (@plugins) {
     }
 }
 
-# Generate 
+# Generate
 sub generate {
-  my($static_or_dynamic, $currentdir, $date, $flavour, $content_type) = @_;
+    my ( $static_or_dynamic, $currentdir, $date, $flavour, $content_type )
+        = @_;
 
-  %files = %$files; %others = ref $others ? %$others : ();
+    %files = %$files;
+    %others = ref $others ? %$others : ();
 
-  # Plugins: Filter
-  foreach my $plugin ( @plugins ) {
-  if ($plugins{$plugin} > 0 and $plugin->can('filter')){ $entries = $plugin->filter(\%files, \%others); }
-  }
-
-  my %f = %files;
-
-  # Plugins: Skip
-  # Allow plugins to decide if we can cut short story generation
-  my $skip;
-  foreach my $plugin (@plugins) {
-      if ( $plugins{$plugin} > 0 and $plugin->can('skip') ) {
-          if ( my $tmp = $plugin->skip() ) {
-              $skip = $tmp;
-              last;
-          }
-      }
-  }
-
-  
-  # Define default interpolation subroutine
-  $interpolate = 
-    sub {
-      package blosxom;
-      my $template = shift;
-      $template =~ 
-        s/(\$\w+(?:::)?\w*)/"defined $1 ? $1 : ''"/gee;
-      return $template;
-    };  
-
-  unless (defined($skip) and $skip) {
-
-    # Plugins: Interpolate
-    # Allow for the first encountered plugin::interpolate subroutine to 
-    # override the default built-in interpolate subroutine
+    # Plugins: Filter
     foreach my $plugin (@plugins) {
-        if ( $plugins{$plugin} > 0 and $plugin->can('interpolate') ) {
-            if ( my $tmp = $plugin->interpolate() ) {
-                $interpolate = $tmp;
+        if ( $plugins{$plugin} > 0 and $plugin->can('filter') ) {
+            $entries = $plugin->filter( \%files, \%others );
+        }
+    }
+
+    my %f = %files;
+
+    # Plugins: Skip
+    # Allow plugins to decide if we can cut short story generation
+    my $skip;
+    foreach my $plugin (@plugins) {
+        if ( $plugins{$plugin} > 0 and $plugin->can('skip') ) {
+            if ( my $tmp = $plugin->skip() ) {
+                $skip = $tmp;
                 last;
             }
         }
     }
-        
-    # Head
-    my $head = (&$template($currentdir,'head',$flavour));
-  
-    # Plugins: Head
-    foreach my $plugin (@plugins) {
-        if ( $plugins{$plugin} > 0 and $plugin->can('head') ) {
-            $entries = $plugin->head( $currentdir, \$head );
-        }
-    }
-  
-    $head = &$interpolate($head);
-  
-    $output .= $head;
-    
-    # Stories
-    my $curdate = '';
-    my $ne = $num_entries;
 
-    if ( $currentdir =~ /(.*?)([^\/]+)\.(.+)$/ and $2 ne 'index' ) {
-      $currentdir = "$1$2.$file_extension";
-      %f = ( "$datadir/$currentdir" => $files{"$datadir/$currentdir"} ) if $files{"$datadir/$currentdir"};
-    } 
-    else { 
-      $currentdir =~ s!/index\..+$!!;
-    }
+    # Define default interpolation subroutine
+    $interpolate = sub {
 
-    # Define a default sort subroutine
-    my $sort = sub {
-      my($files_ref) = @_;
-      return sort { $files_ref->{$b} <=> $files_ref->{$a} } keys %$files_ref;
+        package blosxom;
+        my $template = shift;
+        $template =~ s/(\$\w+(?:::)?\w*)/"defined $1 ? $1 : ''"/gee;
+        return $template;
     };
-  
-    # Plugins: Sort
-    # Allow for the first encountered plugin::sort subroutine to override the
-    # default built-in sort subroutine
-    foreach my $plugin (@plugins) {
-        if ( $plugins{$plugin} > 0 and $plugin->can('sort') ) {
-            if ( my $tmp = $plugin->sort() ) {
-                $sort = $tmp;
-                last;
+
+    unless ( defined($skip) and $skip ) {
+
+        # Plugins: Interpolate
+        # Allow for the first encountered plugin::interpolate subroutine to
+        # override the default built-in interpolate subroutine
+        foreach my $plugin (@plugins) {
+            if ( $plugins{$plugin} > 0 and $plugin->can('interpolate') ) {
+                if ( my $tmp = $plugin->interpolate() ) {
+                    $interpolate = $tmp;
+                    last;
+                }
             }
         }
-    }
-  
-    foreach my $path_file ( &$sort(\%f, \%others) ) {
-      last if $ne <= 0 && $date !~ /\d/;
-      use vars qw/ $path $fn /;
-      ($path,$fn) = $path_file =~ m!^$datadir/(?:(.*)/)?(.*)\.$file_extension!;
-  
-      # Only stories in the right hierarchy
-      $path =~ /^$currentdir/ or $path_file eq "$datadir/$currentdir" or next;
-  
-      # Prepend a slash for use in templates only if a path exists
-      $path &&= "/$path";
 
-      # Date fiddling for by-{year,month,day} archive views
-      use vars qw/ $dw $mo $mo_num $da $ti $yr $hr $min $hr12 $ampm $utc_offset/;
-      ($dw,$mo,$mo_num,$da,$ti,$yr,$utc_offset) = nice_date($files{"$path_file"});
-      ($hr,$min) = split /:/, $ti;
-      ($hr12, $ampm) = $hr >= 12 ? ($hr - 12,'pm') : ($hr, 'am'); 
-      $hr12 =~ s/^0//; if ($hr12 == 0) {$hr12 = 12};
-  
-      # Only stories from the right date
-      my($path_info_yr,$path_info_mo_num, $path_info_da) = split /\//, $date;
-      next if $path_info_yr && $yr != $path_info_yr; last if $path_info_yr && $yr < $path_info_yr; 
-      next if $path_info_mo_num && $mo ne $num2month[$path_info_mo_num];
-      next if $path_info_da && $da != $path_info_da; last if $path_info_da && $da < $path_info_da; 
-  
-      # Date 
-      my $date = (&$template($path,'date',$flavour));
-      
-      # Plugins: Date
-      foreach my $plugin (@plugins) {
-          if ( $plugins{$plugin} > 0 and $plugin->can('date') ) {
-              $entries
-                  = $plugin->date( $currentdir, \$date, $files{$path_file}, $dw,
-                  $mo, $mo_num, $da, $ti, $yr );
-          }
-      }
-  
-      $date = &$interpolate($date);
-  
-      if ( $date && $curdate ne $date ) {
-          $curdate = $date;
-          $output .= $date;
-      }
-      
-      use vars qw/ $title $body $raw /;
-      if (-f "$path_file" && $fh->open("< $path_file")) {
-        chomp($title = <$fh>);
-        chomp($body = join '', <$fh>);
-        $fh->close;
-        $raw = "$title\n$body";
-      }
-      my $story = (&$template($path,'story',$flavour));
-  
-      # Plugins: Story
-      foreach my $plugin (@plugins) {
-          if ( $plugins{$plugin} > 0 and $plugin->can('story') ) {
-              $entries = $plugin->story( $path, $fn, \$story, \$title, \$body );
-          }
-      }
-      
-      if ($content_type =~ m{\bxml\b}) {
-        # Escape <, >, and &, and to produce valid RSS
-        my %escape = ('<'=>'&lt;', '>'=>'&gt;', '&'=>'&amp;', '"'=>'&quot;');  
-        my $escape_re  = join '|' => keys %escape;
-        $title =~ s/($escape_re)/$escape{$1}/g;
-        $body =~ s/($escape_re)/$escape{$1}/g;
-      }
-  
-      $story = &$interpolate($story);
-    
-      $output .= $story;
-      $fh->close;
-  
-      $ne--;
-    }
-  
-    # Foot
-    my $foot = (&$template($currentdir,'foot',$flavour));
-  
-    # Plugins: Foot
-    foreach my $plugin (@plugins) {
-        if ( $plugins{$plugin} > 0 and $plugin->can('foot') ) {
-            $entries = $plugin->foot( $currentdir, \$foot );
+        # Head
+        my $head = ( &$template( $currentdir, 'head', $flavour ) );
+
+        # Plugins: Head
+        foreach my $plugin (@plugins) {
+            if ( $plugins{$plugin} > 0 and $plugin->can('head') ) {
+                $entries = $plugin->head( $currentdir, \$head );
+            }
         }
-    }
-  
-    $foot = &$interpolate($foot);
-    $output .= $foot;
 
-    # Plugins: Last
-    foreach my $plugin (@plugins) {
-        if ( $plugins{$plugin} > 0 and $plugin->can('last') ) {
-            $entries = $plugin->last();
+        $head = &$interpolate($head);
+
+        $output .= $head;
+
+        # Stories
+        my $curdate = '';
+        my $ne      = $num_entries;
+
+        if ( $currentdir =~ /(.*?)([^\/]+)\.(.+)$/ and $2 ne 'index' ) {
+            $currentdir = "$1$2.$file_extension";
+            %f = ( "$datadir/$currentdir" => $files{"$datadir/$currentdir"} )
+                if $files{"$datadir/$currentdir"};
         }
-    }
+        else {
+            $currentdir =~ s!/index\..+$!!;
+        }
 
-  } # End skip
+        # Define a default sort subroutine
+        my $sort = sub {
+            my ($files_ref) = @_;
+            return
+                sort { $files_ref->{$b} <=> $files_ref->{$a} }
+                keys %$files_ref;
+        };
 
-  # Finally, add the header, if any and running dynamically
-  $output = header($header) . $output if ($static_or_dynamic eq 'dynamic' and $header);
-  
-  $output;
+     # Plugins: Sort
+     # Allow for the first encountered plugin::sort subroutine to override the
+     # default built-in sort subroutine
+        foreach my $plugin (@plugins) {
+            if ( $plugins{$plugin} > 0 and $plugin->can('sort') ) {
+                if ( my $tmp = $plugin->sort() ) {
+                    $sort = $tmp;
+                    last;
+                }
+            }
+        }
+
+        foreach my $path_file ( &$sort( \%f, \%others ) ) {
+            last if $ne <= 0 && $date !~ /\d/;
+            use vars qw/ $path $fn /;
+            ( $path, $fn )
+                = $path_file =~ m!^$datadir/(?:(.*)/)?(.*)\.$file_extension!;
+
+            # Only stories in the right hierarchy
+            $path =~ /^$currentdir/
+                or $path_file eq "$datadir/$currentdir"
+                or next;
+
+            # Prepend a slash for use in templates only if a path exists
+            $path &&= "/$path";
+
+            # Date fiddling for by-{year,month,day} archive views
+            use vars
+                qw/ $dw $mo $mo_num $da $ti $yr $hr $min $hr12 $ampm $utc_offset/;
+            ( $dw, $mo, $mo_num, $da, $ti, $yr, $utc_offset )
+                = nice_date( $files{"$path_file"} );
+            ( $hr, $min ) = split /:/, $ti;
+            ( $hr12, $ampm ) = $hr >= 12 ? ( $hr - 12, 'pm' ) : ( $hr, 'am' );
+            $hr12 =~ s/^0//;
+            if ( $hr12 == 0 ) { $hr12 = 12 }
+
+            # Only stories from the right date
+            my ( $path_info_yr, $path_info_mo_num, $path_info_da )
+                = split /\//, $date;
+            next if $path_info_yr     && $yr != $path_info_yr;
+            last if $path_info_yr     && $yr < $path_info_yr;
+            next if $path_info_mo_num && $mo ne $num2month[$path_info_mo_num];
+            next if $path_info_da     && $da != $path_info_da;
+            last if $path_info_da     && $da < $path_info_da;
+
+            # Date
+            my $date = ( &$template( $path, 'date', $flavour ) );
+
+            # Plugins: Date
+            foreach my $plugin (@plugins) {
+                if ( $plugins{$plugin} > 0 and $plugin->can('date') ) {
+                    $entries
+                        = $plugin->date( $currentdir, \$date,
+                        $files{$path_file}, $dw, $mo, $mo_num, $da, $ti,
+                        $yr );
+                }
+            }
+
+            $date = &$interpolate($date);
+
+            if ( $date && $curdate ne $date ) {
+                $curdate = $date;
+                $output .= $date;
+            }
+
+            use vars qw/ $title $body $raw /;
+            if ( -f "$path_file" && $fh->open("< $path_file") ) {
+                chomp( $title = <$fh> );
+                chomp( $body = join '', <$fh> );
+                $fh->close;
+                $raw = "$title\n$body";
+            }
+            my $story = ( &$template( $path, 'story', $flavour ) );
+
+            # Plugins: Story
+            foreach my $plugin (@plugins) {
+                if ( $plugins{$plugin} > 0 and $plugin->can('story') ) {
+                    $entries = $plugin->story( $path, $fn, \$story, \$title,
+                        \$body );
+                }
+            }
+
+            if ( $content_type =~ m{\bxml\b} ) {
+
+                # Escape <, >, and &, and to produce valid RSS
+                my %escape = (
+                    '<' => '&lt;',
+                    '>' => '&gt;',
+                    '&' => '&amp;',
+                    '"' => '&quot;'
+                );
+                my $escape_re = join '|' => keys %escape;
+                $title =~ s/($escape_re)/$escape{$1}/g;
+                $body  =~ s/($escape_re)/$escape{$1}/g;
+            }
+
+            $story = &$interpolate($story);
+
+            $output .= $story;
+            $fh->close;
+
+            $ne--;
+        }
+
+        # Foot
+        my $foot = ( &$template( $currentdir, 'foot', $flavour ) );
+
+        # Plugins: Foot
+        foreach my $plugin (@plugins) {
+            if ( $plugins{$plugin} > 0 and $plugin->can('foot') ) {
+                $entries = $plugin->foot( $currentdir, \$foot );
+            }
+        }
+
+        $foot = &$interpolate($foot);
+        $output .= $foot;
+
+        # Plugins: Last
+        foreach my $plugin (@plugins) {
+            if ( $plugins{$plugin} > 0 and $plugin->can('last') ) {
+                $entries = $plugin->last();
+            }
+        }
+
+    }    # End skip
+
+    # Finally, add the header, if any and running dynamically
+    $output = header($header) . $output
+        if ( $static_or_dynamic eq 'dynamic' and $header );
+
+    $output;
 }
-
 
 sub nice_date {
-  my($unixtime) = @_;
-  
-  my $c_time = ctime($unixtime);
-  my($dw,$mo,$da,$hr,$min,$yr) = ( $c_time =~ /(\w{3}) +(\w{3}) +(\d{1,2}) +(\d{2}):(\d{2}):\d{2} +(\d{4})$/ );
-  $ti="$hr:$min";
-  $da = sprintf("%02d", $da);
-  my $mo_num = $month2num{$mo};
+    my ($unixtime) = @_;
 
-  my $offset = timegm(00, $min, $hr, $da, $mo_num-1, $yr-1900)-$unixtime;  
-  my $utc_offset = sprintf("%+03d", int($offset / 3600)).sprintf("%02d", ($offset % 3600)/60) ;
+    my $c_time = ctime($unixtime);
+    my ( $dw, $mo, $da, $hr, $min, $yr )
+        = ( $c_time
+            =~ /(\w{3}) +(\w{3}) +(\d{1,2}) +(\d{2}):(\d{2}):\d{2} +(\d{4})$/
+        );
+    $ti = "$hr:$min";
+    $da = sprintf( "%02d", $da );
+    my $mo_num = $month2num{$mo};
 
-  return ($dw,$mo,$mo_num,$da,$ti,$yr,$utc_offset);
+    my $offset
+        = timegm( 00, $min, $hr, $da, $mo_num - 1, $yr - 1900 ) - $unixtime;
+    my $utc_offset = sprintf( "%+03d", int( $offset / 3600 ) )
+        . sprintf( "%02d", ( $offset % 3600 ) / 60 );
+
+    return ( $dw, $mo, $mo_num, $da, $ti, $yr, $utc_offset );
 }
-
 
 # Default HTML and RSS template bits
 __DATA__
@@ -759,3 +785,4 @@ error date <h3>$dw, $da $mo $yr</h3>
 error foot     </body>
 error foot </html>
 __END__
+
