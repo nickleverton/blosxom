@@ -157,7 +157,7 @@ $flavour = '';
 
 if ( $path_info[$#path_info] =~ /(.+)\.(.+)$/ ) {
   $flavour = $2;
-  $1 ne 'index' and $path_info .= "/$1.$2";
+  $path_info .= "/$1.$2" if $1 ne 'index';
   pop @path_info;
 } else {
   $flavour = param('flav') || $default_flavour;
