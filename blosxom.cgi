@@ -538,7 +538,11 @@ sub generate {
     $output .= $foot;
 
     # Plugins: Last
-    foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('last') and $entries = $plugin->last() }
+    foreach my $plugin (@plugins) {
+        if ( $plugins{$plugin} > 0 and $plugin->can('last') ) {
+            $entries = $plugin->last();
+        }
+    }
 
   } # End skip
 
