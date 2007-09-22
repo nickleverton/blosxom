@@ -547,7 +547,7 @@ sub generate {
   } # End skip
 
   # Finally, add the header, if any and running dynamically
-  $static_or_dynamic eq 'dynamic' and $header and $output = header($header) . $output;
+  $output = header($header) . $output if ($static_or_dynamic eq 'dynamic' and $header);
   
   $output;
 }
