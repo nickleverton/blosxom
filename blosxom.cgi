@@ -137,7 +137,7 @@ $url =~ s!/$!!;
 $datadir =~ s!/$!!; $plugin_dir =~ s!/$!!; $static_dir =~ s!/$!!;
   
 # Fix depth to take into account datadir's path
-$depth and $depth += ($datadir =~ tr[/][]) - 1;
+$depth += ($datadir =~ tr[/][]) - 1 if $depth;
 
 # Global variable to be used in head/foot.{flavour} templates
 $path_info = '';
