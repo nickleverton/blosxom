@@ -505,7 +505,13 @@ sub generate {
       my $date = (&$template($path,'date',$flavour));
       
       # Plugins: Date
-      foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('date') and $entries = $plugin->date($currentdir, \$date, $files{$path_file}, $dw,$mo,$mo_num,$da,$ti,$yr) }
+      foreach my $plugin (@plugins) {
+          if ( $plugins{$plugin} > 0 and $plugin->can('date') ) {
+              $entries
+                  = $plugin->date( $currentdir, \$date, $files{$path_file}, $dw,
+                  $mo, $mo_num, $da, $ti, $yr );
+          }
+      }
   
       $date = &$interpolate($date);
   
