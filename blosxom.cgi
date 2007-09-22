@@ -379,7 +379,16 @@ sub generate {
 
   # Plugins: Skip
   # Allow plugins to decide if we can cut short story generation
-  my $skip; foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('skip') and defined($tmp = $plugin->skip()) and $skip = $tmp and last; }
+  my $skip;
+  foreach my $plugin (@plugins) {
+      if ( $plugins{$plugin} > 0 and $plugin->can('skip') ) {
+          if ( my $tmp = $plugin->skip() ) {
+              $skip = $tmp;
+              last;
+          }
+      }
+  }
+
   
   # Define default interpolation subroutine
   $interpolate = 
