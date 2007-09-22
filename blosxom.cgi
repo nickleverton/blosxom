@@ -258,7 +258,14 @@ shift @INC foreach @plugin_dirs;
 # Plugins: Template
 # Allow for the first encountered plugin::template subroutine to override the
 # default built-in template subroutine
-my $tmp; foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('template') and defined($tmp = $plugin->template()) and $template = $tmp and last; }
+foreach my $plugin (@plugins) {
+    if ( $plugins{$plugin} > 0 and $plugin->can('template') ) {
+        if ( my $tmp = $plugin->template() ) {
+            $template = $tmp;
+            last;
+        }
+    }
+}
 
 # Provide backward compatibility for Blosxom < 2.0rc1 plug-ins
 sub load_template {
