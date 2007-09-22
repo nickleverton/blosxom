@@ -317,7 +317,14 @@ $entries =
 # Plugins: Entries
 # Allow for the first encountered plugin::entries subroutine to override the
 # default built-in entries subroutine
-my $tmp; foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('entries') and defined($tmp = $plugin->entries()) and $entries = $tmp and last; }
+foreach my $plugin (@plugins) {
+    if ( $plugins{$plugin} > 0 and $plugin->can('entries') ) {
+        if ( my $tmp = $plugin->entries() ) {
+            $entries = $tmp;
+            last;
+        }
+    }
+}
 
 my ($files, $indexes, $others) = &$entries();
 %indexes = %$indexes;
