@@ -405,7 +405,14 @@ sub generate {
     # Plugins: Interpolate
     # Allow for the first encountered plugin::interpolate subroutine to 
     # override the default built-in interpolate subroutine
-    my $tmp; foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('interpolate') and defined($tmp = $plugin->interpolate()) and $interpolate = $tmp and last; }
+    foreach my $plugin (@plugins) {
+        if ( $plugins{$plugin} > 0 and $plugin->can('interpolate') ) {
+            if ( my $tmp = $plugin->interpolate() ) {
+                $interpolate = $tmp;
+                last;
+            }
+        }
+    }
         
     # Head
     my $head = (&$template($currentdir,'head',$flavour));
