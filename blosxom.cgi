@@ -502,7 +502,11 @@ sub generate {
       my $story = (&$template($path,'story',$flavour));
   
       # Plugins: Story
-      foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('story') and $entries = $plugin->story($path, $fn, \$story, \$title, \$body) }
+      foreach my $plugin (@plugins) {
+          if ( $plugins{$plugin} > 0 and $plugin->can('story') ) {
+              $entries = $plugin->story( $path, $fn, \$story, \$title, \$body );
+          }
+      }
       
       if ($content_type =~ m{\bxml\b}) {
         # Escape <, >, and &, and to produce valid RSS
