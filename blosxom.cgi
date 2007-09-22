@@ -418,7 +418,11 @@ sub generate {
     my $head = (&$template($currentdir,'head',$flavour));
   
     # Plugins: Head
-    foreach my $plugin ( @plugins ) { $plugins{$plugin} > 0 and $plugin->can('head') and $entries = $plugin->head($currentdir, \$head) }
+    foreach my $plugin (@plugins) {
+        if ( $plugins{$plugin} > 0 and $plugin->can('head') ) {
+            $entries = $plugin->head( $currentdir, \$head );
+        }
+    }
   
     $head = &$interpolate($head);
   
