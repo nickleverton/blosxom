@@ -84,7 +84,6 @@ use strict;
 use FileHandle;
 use File::Find;
 use File::stat;
-use Time::localtime;
 use Time::Local;
 use CGI qw/:standard :netscape/;
 
@@ -692,7 +691,7 @@ sub generate {
 sub nice_date {
     my ($unixtime) = @_;
 
-    my $c_time = ctime($unixtime);
+    my $c_time = CORE::localtime($unixtime);
     my ( $dw, $mo, $da, $hr, $min, $yr )
         = ( $c_time
             =~ /(\w{3}) +(\w{3}) +(\d{1,2}) +(\d{2}):(\d{2}):\d{2} +(\d{4})$/
