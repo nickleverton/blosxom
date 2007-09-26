@@ -48,17 +48,18 @@ $show_future_entries = 0;
 # --- Plugins (Optional) -----
 
 # File listing plugins blosxom should load
-# (if empty blosxom will load all plugins in $plugin_path directories)
+# (if empty blosxom will load all plugins in $plugin_dir and $plugin_path directories)
 $plugin_list = "";
 
 # Where are my plugins kept?
-# List of directories, separated by ';' on windows, ':' everywhere else
-$plugin_path = "";
+$plugin_dir = "";
 
 # Where should my plugins keep their state information?
-$plugin_state_dir = "";
+$plugin_state_dir = "$plugin_dir/state";
 
-#$plugin_state_dir = "/var/lib/blosxom/state";
+# Additional plugins location
+# List of directories, separated by ';' on windows, ':' everywhere else
+$plugin_path = "";
 
 # --- Static Rendering -----
 
@@ -244,7 +245,8 @@ while (<DATA>) {
 
 # Plugins: Start
 my $path_sep = $^O eq 'MSWin32' ? ';' : ':';
-my @plugin_dirs = split /$path_sep/, ( $plugin_path || $plugin_dir );
+my @plugin_dirs = split /$path_sep/, $plugin_path;
+unshift @plugin_dirs, $plugin_dir;
 my @plugin_list = ();
 my %plugin_hash = ();
 
@@ -291,8 +293,10 @@ foreach my $plugin (@plugin_list) {
      # For Blosxom::Plugin::Foo style plugins, we need to use a string require
         eval "require $plugin_name";
     }
-    else {
-        eval { require $plugin };
+    else
+    { # we try first to load from $plugin_dir before attempting from $plugin_path
+        eval        { require "$plugin_dir/$plugin" }
+            or eval { require $plugin };
     }
 
     if ($@) {
