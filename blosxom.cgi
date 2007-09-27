@@ -457,7 +457,7 @@ else {
     my $content_type = ( &$template( $path_info, 'content_type', $flavour ) );
     $content_type =~ s!\n.*!!s;
 
-    $content_type =~ s/(\$\w+(?:::)?\w*)/"defined $1 ? $1 : ''"/gee;
+    $content_type =~ s/(\$\w+(?:::\w+)*)/"defined $1 ? $1 : ''"/gee;
     $header = { -type => $content_type };
 
     print generate( 'dynamic', $path_info,
@@ -506,7 +506,7 @@ sub generate {
 
         package blosxom;
         my $template = shift;
-        $template =~ s/(\$\w+(?:::)?\w*)/"defined $1 ? $1 : ''"/gee;
+        $template =~ s/(\$\w+(?:::\w+)*)/"defined $1 ? $1 : ''"/gee;
         return $template;
     };
 
