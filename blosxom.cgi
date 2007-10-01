@@ -251,8 +251,6 @@ my @plugin_list = ();
 my %plugin_hash = ();
 
 # If $plugin_list is set, read plugins to use from that file
-$plugin_list = "$config_dir/$plugin_list"
-    if $plugin_list && $plugin_list !~ m!^\s*/!;
 if ( $plugin_list and -r $plugin_list and $fh->open("< $plugin_list") ) {
     @plugin_list = map { chomp $_; $_ } grep { /\S/ && !/^#/ } <$fh>;
     $fh->close;
