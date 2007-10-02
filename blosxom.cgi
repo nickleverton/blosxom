@@ -694,16 +694,16 @@ sub nice_date {
     my ($unixtime) = @_;
 
     my $c_time = CORE::localtime($unixtime);
-    my ( $dw, $mo, $da, $hr, $min, $yr )
+    my ( $dw, $mo, $da, $hr, $min, $sec, $yr )
         = ( $c_time
-            =~ /(\w{3}) +(\w{3}) +(\d{1,2}) +(\d{2}):(\d{2}):\d{2} +(\d{4})$/
+            =~ /(\w{3}) +(\w{3}) +(\d{1,2}) +(\d{2}):(\d{2}):(\d{2}) +(\d{4})$/
         );
     $ti = "$hr:$min";
     $da = sprintf( "%02d", $da );
     my $mo_num = $month2num{$mo};
 
     my $offset
-        = timegm( 00, $min, $hr, $da, $mo_num - 1, $yr - 1900 ) - $unixtime;
+        = timegm( $sec, $min, $hr, $da, $mo_num - 1, $yr - 1900 ) - $unixtime;
     my $utc_offset = sprintf( "%+03d", int( $offset / 3600 ) )
         . sprintf( "%02d", ( $offset % 3600 ) / 60 );
 
