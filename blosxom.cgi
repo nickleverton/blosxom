@@ -251,13 +251,19 @@ my @plugin_list = ();
 my %plugin_hash = ();
 
 # If $plugin_list is set, read plugins to use from that file
-if ( $plugin_list and -r $plugin_list and $fh->open("< $plugin_list") ) {
-    @plugin_list = map { chomp $_; $_ } grep { /\S/ && !/^#/ } <$fh>;
-    $fh->close;
+if ( $plugin_list ) {
+    if ( -r $plugin_list and $fh->open("< $plugin_list") ) {
+        @plugin_list = map { chomp $_; $_ } grep { /\S/ && !/^#/ } <$fh>;
+        $fh->close;
+    }
+    else {
+        warn "unable to read or open plugin_list '$plugin_list': $!";
+        $plugin_list = '';
+    }
 }
 
 # Otherwise walk @plugin_dirs to get list of plugins to use
-elsif (@plugin_dirs) {
+if ( ! @plugin_list && @plugin_dirs ) {
     for my $plugin_dir (@plugin_dirs) {
         next unless -d $plugin_dir;
         if ( opendir PLUGINS, $plugin_dir ) {
@@ -283,18 +289,19 @@ elsif (@plugin_dirs) {
 unshift @INC, @plugin_dirs;
 foreach my $plugin (@plugin_list) {
     my ( $plugin_name, $off ) = $plugin =~ /^\d*([\w:]+?)(_?)$/;
+    my $plugin_file = $plugin_list ? $plugin_name : $plugin;
     my $on_off = $off eq '_' ? -1 : 1;
 
     # Allow perl module plugins
-    if ( $plugin =~ m/::/ && -z $plugin_hash{$plugin} ) {
+    if ( $plugin =~ m/::/ && ( $plugin_list || -z $plugin_hash{$plugin} ) ) {
 
      # For Blosxom::Plugin::Foo style plugins, we need to use a string require
-        eval "require $plugin_name";
+        eval "require $plugin_file";
     }
     else
     { # we try first to load from $plugin_dir before attempting from $plugin_path
-        eval        { require "$plugin_dir/$plugin" }
-            or eval { require $plugin };
+        eval        { require "$plugin_dir/$plugin_file" }
+            or eval { require $plugin_file };
     }
 
     if ($@) {
