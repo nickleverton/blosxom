@@ -293,6 +293,8 @@ foreach my $plugin (@plugin_list) {
     my $on_off = $off eq '_' ? -1 : 1;
 
     # Allow perl module plugins
+    # The -z test is a hack to allow a zero-length placeholder file in a 
+    #   $plugin_path directory to indicate an @INC module should be loaded
     if ( $plugin =~ m/::/ && ( $plugin_list || -z $plugin_hash{$plugin} ) ) {
 
      # For Blosxom::Plugin::Foo style plugins, we need to use a string require
