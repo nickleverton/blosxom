@@ -726,7 +726,7 @@ html content_type text/html; charset=$blog_encoding
 html head <html>
 html head     <head>
 html head         <meta http-equiv="content-type" content="text/html;charset=$blog_encoding" />
-html head         <link rel="alternate" type="type="application/rss+xml" title="RSS" href="$url/index.rss" />
+html head         <link rel="alternate" type="application/rss+xml" title="RSS" href="$url/index.rss" />
 html head         <title>$blog_title $path_info_da $path_info_mo $path_info_yr
 html head         </title>
 html head     </head>

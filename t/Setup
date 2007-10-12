@@ -20,6 +20,7 @@ close $th;
 
 for my $t (@tests) {
   chomp $t;
+  unlink $t if -l $t;
   print "symlink $DRIVER $t\n"; 
   eval { symlink $DRIVER, $t } or die "symlink $DRIVER, $t failed: $!";
 } 
