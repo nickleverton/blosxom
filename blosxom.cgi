@@ -510,10 +510,10 @@ sub generate {
 
     # Define default interpolation subroutine
     $interpolate = sub {
-
         package blosxom;
         my $template = shift;
-        $template =~ s/(\$\w+(?:::\w+)*)/"defined $1 ? $1 : ''"/gee;
+        # Interpolate scalars, namespaced scalars, and hash/hashref scalars
+        $template =~ s/(\$\w+(?:::\w+)*(?:(?:->)?{(['"]?)[-\w]+\2})?)/"defined $1 ? $1 : ''"/gee;
         return $template;
     };
 
