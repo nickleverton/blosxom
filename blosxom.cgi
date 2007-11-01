@@ -79,7 +79,7 @@ $static_entries = 0;
 # --------------------------------
 
 use vars
-    qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others !;
+    qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others $encode_xml_entities !;
 
 use strict;
 use FileHandle;
@@ -89,6 +89,9 @@ use Time::Local;
 use CGI qw/:standard :netscape/;
 
 $version = "2.0.2";
+
+# Should I encode entities for xml content-types? (plugins can turn this off if they do it themselves)
+$encode_xml_entities = 1;
 
 # Load configuration from $ENV{BLOSXOM_CONFIG_DIR}/blosxom.conf, if it exists
 my $blosxom_config;
@@ -648,7 +651,7 @@ sub generate {
                 }
             }
 
-            if ( $content_type =~ m{\bxml\b} ) {
+            if ( $encode_xml_entities && $content_type =~ m{\bxml\b} ) {
 
                 # Escape <, >, and &, and to produce valid RSS
                 my %escape = (
