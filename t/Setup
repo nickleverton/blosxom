@@ -7,7 +7,7 @@ use strict;
 use IO::File;
 
 my $DRIVER = 'driver';
-my $TESTS = 'driver_tests';
+my $TESTS = 'Tests';
 die "cannot find driver file '$DRIVER'" unless -f $DRIVER;
 die "cannot find tests file '$TESTS'" unless -f $TESTS;
 
