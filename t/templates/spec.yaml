@@ -1,4 +1,13 @@
 tests:
   - 
     - ""
-    - expected.html
+    - "expected/index.html"
+  - 
+    - "path=/index.rss"
+    - "expected/index.rss"
+  - 
+    - "path=/web/index.html"
+    - "expected/web/index.html"
+  - 
+    - "path=/web/index.rss"
+    - "expected/web/index.rss"
