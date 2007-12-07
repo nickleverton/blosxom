@@ -28,8 +28,20 @@ die "cannot find blosxom config dir '$blosxom_config_dir'" unless -d $blosxom_co
 $ENV{BLOSXOM_CONFIG_DIR} = $blosxom_config_dir;
 $ENV{TZ} = 'UTC';
 
-my $blosxom_cgi = "$testdir/../../blosxom.cgi";
-die "cannot find blosxom.cgi '$blosxom_cgi'" unless -f $blosxom_cgi;
+my $blosxom_cgi = $ENV{BLOSXOM_CGI};
+unless ($blosxom_cgi && -f $blosxom_cgi) {
+  if (-f "$testdir/../../blosxom.cgi") {
+    $blosxom_cgi = "$testdir/../../blosxom.cgi";
+    warn "ignoring BLOSXOM_CGI setting '$ENV{BLOSXOM_CGI}' - using '$blosxom_cgi' instead"
+      if $ENV{BLOSXOM_CGI};
+  }
+  elsif ($blosxom_cgi) {
+    die "cannot find blosxom.cgi '$blosxom_cgi' - check your BLOSXOM_CGI environment variable";
+  }
+  else {
+    die "cannot find blosxom.cgi - please set the BLOSXOM_CGI environment variable";
+  }
+}
 die "blosxom.cgi '$blosxom_cgi' is not executable" unless -x $blosxom_cgi;
 
 my $spec = YAML::LoadFile ("$testdir/spec.yaml") 
@@ -68,6 +80,7 @@ if ($static_password) {
       my ($a_short, $b_short) = ($a, $b);
       $a_short =~ s!^.*\.\./!! if $a_short;
       $b_short =~ s!^.*\.\./!! if $b_short;
+      return if $b =~ m! /CVS$ !x;
       if (! $b) {
         fail("$a_short has no corresponding file");
       } elsif (! $a) {
@@ -91,6 +104,9 @@ if ($static_password) {
         eq_or_diff($got, $expected, "file $a_short and $b_short match", { style => 'Unified' });
       }
     }, { ignore_cmp => 1 });
+
+    # Cleanup static output
+    File::Remove::remove(\1, "$static_dir/*") unless $ENV{BLOSXOM_STATIC_NO_CLEANUP};
   }
 }
 
