@@ -13,7 +13,7 @@
         <pubDate>Wed, 19 Jul 2006 22:54:00 +0000</pubDate>
         <language>en</language>
         <generator>blosxom 2.0.2</generator>
-        <atom:link href="http://localhost" rel="self" type="application/rss+xml" />
+        <atom:link href="http://localhost/index.rss" rel="self" type="application/rss+xml" />
         <sy:updatePeriod>hourly</sy:updatePeriod>
         <sy:updateFrequency>1</sy:updateFrequency>
         <sy:updateBase>2000-01-01T12:00+00:00</sy:updateBase>
