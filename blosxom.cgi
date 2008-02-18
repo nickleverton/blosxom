@@ -1,20 +1,20 @@
 #!/usr/bin/perl
 
-use warnings;
-use strict;
-
 # Blosxom
 # Author: Rael Dornfest <rael@oreilly.com>
 # Version: 2.0.2+njl
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
+use warnings;
+use strict;
+
 package blosxom;
+
+# --- Configurable variables -----
 
 use vars
     qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $put_template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info_full $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others $encode_xml_entities !;
-
-# --- Configurable variables -----
 
 # What's this blog's title?
 $blog_title = "My Weblog";
@@ -82,14 +82,19 @@ $static_password = "";
 # 0 = no, 1 = yes
 $static_entries = 0;
 
+# --- Template variables -----
+
+# --- Callback variables -----
+
+# --- Control variables -----
+
 # --------------------------------
 
-use strict;
 use FileHandle;
 use File::Find;
 use File::stat;
 use Time::Local;
-use CGI qw/:standard :netscape/;
+use CGI qw/ -compile :standard :netscape/;
 
 $version = "2.0.2+njl";
 
@@ -106,7 +111,7 @@ else {
     for my $blosxom_config_dir ( $ENV{BLOSXOM_CONFIG_DIR}, '/etc/blosxom',
         '/etc' )
     {
-        if ( defined( $blosxom_config_dir ) && -d $blosxom_config_dir && -r "$blosxom_config_dir/blosxom.conf" ) {
+        if ( defined( $blosxom_config_dir ) && -r "$blosxom_config_dir/blosxom.conf" ) {
             $config_dir     = $blosxom_config_dir;
             $blosxom_config = "$blosxom_config_dir/blosxom.conf";
             last;
@@ -189,9 +194,10 @@ my @path_info = split m{/}, path_info() || param('path');
 $path_info_full = join '/', @path_info;      # Equivalent to $ENV{PATH_INFO}
 shift @path_info;
 
-while ( $path_info[0]
-    and $path_info[0] =~ /^[a-zA-Z].*$/
-    and $path_info[0] !~ /(.*)\.(.*)/ )
+# Category/directory names denoted by leading alpha and no dot (no flavour).
+while ( @path_info
+    and $path_info[0] =~ /^[a-zA-Z]/
+    and $path_info[0] !~ /\./ )
 {
     $path_info .= '/' . shift @path_info;
 }
@@ -199,7 +205,7 @@ while ( $path_info[0]
 # Flavour specified by ?flav={flav} or index.{flav}
 $flavour = '';
 
-if ( $path_info[$#path_info] =~ /(.+)\.(.+)$/ ) {
+if ( @path_info && $path_info[$#path_info] =~ /(.+)\.([^.]+)$/ ) {
     $flavour = $2;
     $path_info .= "/$1.$2" if $1 ne 'index';
     pop @path_info;
@@ -208,35 +214,47 @@ else {
     $flavour = param('flav') || $default_flavour;
 }
 
-# Strip spurious slashes
-$path_info =~ s!(^/*)|(/*$)!!g;
+# Strip leading and trailing slashes from remainder
+$path_info =~ s:^/+|/+$::g;
 
 # Date fiddling
 ( $path_info_yr, $path_info_mo, $path_info_da ) = @path_info;
-$path_info_mo_num
-    = $path_info_mo
-    ? ( $path_info_mo =~ /\d{2}/
-    ? $path_info_mo
-    : ( $month2num{ ucfirst( lc $path_info_mo ) } || undef ) )
-    : undef;
+$path_info_mo_num =
+    $path_info_mo
+	? ( $path_info_mo =~ /\d{2}/
+	    ? $path_info_mo
+	    : ( $month2num{ ucfirst( lc $path_info_mo ) } || undef ) )
+	: undef;
 
 # Define standard template subroutine, plugin-overridable at Plugins: Template
 $template = sub {
     my ( $path, $chunk, $flavour ) = @_;
 
     do {
+	# print( STDERR "templ path: $flavour, $chunk, $path" ),
         return join '', <$fh>
             if $fh->open("< $datadir/$path/$chunk.$flavour");
-    } while ( $path =~ s/(\/*[^\/]*)$// and $1 );
+    } while ( $path && $path =~ s:/*[^/]*$:: );
 
-    # Check for existence, since flavour can be the empty string
-    if ( defined $blosxom::template{$flavour}{$chunk} ) {
+    # Check for existence, avoids "if defined" instantiating hash elements that don't exist
+    # whilst still returning template contents which are defined and blank.
+    if ( exists $blosxom::template{$flavour}{$chunk} ) {
+	# print STDERR "templ get: $flavour, $chunk, ". $blosxom::template{$flavour}{$chunk};
         return $blosxom::template{$flavour}{$chunk};
     }
-    elsif ( defined $blosxom::template{error}{$chunk} ) {
+    # configurable "default flavour" template - reduces configuration effort for plugin templates
+    elsif ( exists $blosxom::template{default}{$chunk} ) {
+	# print STDERR "templ dflt: $flavour, $chunk, ". $blosxom::template{default}{$chunk};
+        return $blosxom::template{default}{$chunk};
+    }
+    # configurable "no such flavour" template
+    elsif ( exists $blosxom::template{error}{$chunk} ) {
+	# print STDERR "templ err: $flavour, $chunk, ". $blosxom::template{error}{$chunk};
         return $blosxom::template{error}{$chunk};
     }
+    # no such template at all - return blank
     else {
+	# print STDERR "templ null: $flavour, $chunk";
         return '';
     }
 };
@@ -245,6 +263,7 @@ $put_template = sub {
     my ( $chunk, $flavour, $template ) = @_;
 
     $blosxom::template{$flavour}{$chunk} = $template;
+    # print STDERR "templ put: $flavour, $chunk, ". $blosxom::template{$flavour}{$chunk};
 };
 
 # Bring in the templates
@@ -366,6 +385,8 @@ $entries = sub {
                 and $2 ne 'index' and $2 !~ /^\./ and ( -r $File::Find::name )
                 )
             {
+		my( $dirname, $basename ) = ($1, $2);
+		$dirname = "" unless defined $dirname;
 
                 # read modification time
                 my $mtime = stat($File::Find::name)->mtime or return;
@@ -378,15 +399,15 @@ $entries = sub {
 
                 # static rendering bits
                 my $static_file
-                    = "$static_dir/$1/index." . $static_flavours[0];
+                    = "$static_dir/$dirname/index." . $static_flavours[0];
                 if (   param('-all')
                     or !-f $static_file
                     or stat($static_file)->mtime < $mtime )
                 {
-                    $indexes{$1} = 1;
+                    $indexes{$dirname} = 1;
                     $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
                     $indexes{$d} = $d;
-                    $indexes{ ( $1 ? "$1/" : '' ) . "$2.$file_extension" } = 1
+                    $indexes{ ( $dirname ? "$dirname/" : '' ) . "$basename.$file_extension" } = 1
                         if $static_entries;
                 }
             }
@@ -570,7 +591,7 @@ sub generate {
                 if $files{"$datadir/$currentdir"};
         }
         else {
-            $currentdir =~ s!/index\..+$!!;
+            $currentdir =~ s:/index\..+$::;
         }
 
         # Define a default sort subroutine
@@ -598,6 +619,7 @@ sub generate {
             use vars qw/ $path $fn /;
             ( $path, $fn )
                 = $path_file =~ m!^$datadir/(?:(.*)/)?(.*)\.$file_extension!;
+	    $path = "" unless defined $path;
 
             # Only stories in the right hierarchy
             $path =~ /^$currentdir/
@@ -614,8 +636,8 @@ sub generate {
                 = nice_date( $files{"$path_file"} );
             ( $hr, $min ) = split /:/, $ti;
             ( $hr12, $ampm ) = $hr >= 12 ? ( $hr - 12, 'pm' ) : ( $hr, 'am' );
-            $hr12 =~ s/^0//;
             if ( $hr12 == 0 ) { $hr12 = 12 }
+            $hr12 =~ s/^0//;
 
             # Only stories from the right date
             my ( $path_info_yr, $path_info_mo_num, $path_info_da )
