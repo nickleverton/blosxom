@@ -1,5 +1,5 @@
 v2.0.3
-    * added initial blosxom.spec and supporting files in rpm directory
+    * redo path_info handling with much stricter date tests
     * added support for multiple plugin directories using $plugin_path
 	* changed plugin loading to use @INC instead of hardcoded 
 	  $plugin_dir
