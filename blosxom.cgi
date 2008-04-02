@@ -622,9 +622,8 @@ sub generate {
 	    $path = "" unless defined $path;
 
             # Only stories in the right hierarchy
-            $path =~ /^$currentdir/
-                or $path_file eq "$datadir/$currentdir"
-                or next;
+	    next unless $path =~ /^\Q$currentdir/
+                or $path_file eq "$datadir/$currentdir";
 
             # Prepend a slash for use in templates only if a path exists
             $path &&= "/$path";
