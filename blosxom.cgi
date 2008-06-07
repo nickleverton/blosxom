@@ -729,8 +729,10 @@ sub generate {
     }    # End skip
 
     # Finally, add the header, if any and running dynamically
-    $output = header($header) . $output
-        if ( $static_or_dynamic eq 'dynamic' and $header );
+    if ( $static_or_dynamic eq 'dynamic' && $header ) {
+	$header->{ '-content-length' } = length($output);
+	$output = header($header) . $output;
+    }
 
     $output;
 }
