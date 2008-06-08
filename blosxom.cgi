@@ -233,7 +233,7 @@ $template = sub {
     do {
 	# print( STDERR "templ path: $flavour, $chunk, $path" ),
         return join '', <$fh>
-            if $fh->open("< $datadir/$path/$chunk.$flavour");
+            if $fh->open("$datadir/$path/$chunk.$flavour", "<");
     } while ( $path && $path =~ s:/*[^/]*$:: );
 
     # Check for existence, avoids "if defined" instantiating hash elements that don't exist
@@ -284,7 +284,7 @@ my %plugin_hash = ();
 
 # If $plugin_list is set, read plugins to use from that file
 if ( $plugin_list ) {
-    if ( -r $plugin_list and $fh->open("< $plugin_list") ) {
+    if ( -r $plugin_list and $fh->open($plugin_list, "<") ) {
         @plugin_list = map { chomp $_; $_ } grep { /\S/ && !/^#/ } <$fh>;
         $fh->close;
     }
@@ -668,7 +668,7 @@ sub generate {
             }
 
             use vars qw/ $title $body $raw /;
-            if ( -f "$path_file" && $fh->open("< $path_file") ) {
+            if ( -f "$path_file" && $fh->open($path_file, "<") ) {
                 chomp( $title = <$fh> );
                 chomp( $body = join '', <$fh> );
                 $fh->close;
