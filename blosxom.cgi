@@ -735,34 +735,31 @@ sub nice_date {
 __DATA__
 html content_type text/html; charset=$blog_encoding
 
+html head <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 html head <html>
 html head     <head>
-html head         <meta http-equiv="content-type" content="text/html;charset=$blog_encoding" />
-html head         <link rel="alternate" type="application/rss+xml" title="RSS" href="$url/index.rss" />
-html head         <title>$blog_title $path_info_da $path_info_mo $path_info_yr
-html head         </title>
+html head         <meta http-equiv="content-type" content="text/html;charset=$blog_encoding" >
+html head         <link rel="alternate" type="application/rss+xml" title="RSS" href="$url/index.rss" >
+html head         <title>$blog_title $path_info_da $path_info_mo $path_info_yr</title>
 html head     </head>
 html head     <body>
-html head         <center>
-html head             <font size="+3">$blog_title</font><br />
-html head             $path_info_da $path_info_mo $path_info_yr
-html head         </center>
-html head         <p />
+html head         <div align="center">
+html head             <h1>$blog_title</h1>
+html head             <p>$path_info_da $path_info_mo $path_info_yr</p>
+html head         </div>
 
-html story        <p>
-html story            <a name="$fn"><b>$title</b></a><br />
-html story            $body<br />
-html story            <br />
-html story            posted at: $ti | path: <a href="$url$path">$path </a> | <a href="$url/$yr/$mo_num/$da#$fn">permanent link to this entry</a>
-html story        </p>
+html story         <div>
+html story             <h3><a name="$fn">$title</a></h3>
+html story             <div>$body</div>
+html story             <p>posted at: $ti | path: <a href="$url$path">$path</a> | <a href="$url/$yr/$mo_num/$da#$fn">permanent link to this entry</a></p>
+html story         </div>
 
-html date         <h3>$dw, $da $mo $yr</h3>
+html date         <h2>$dw, $da $mo $yr</h2>
 
 html foot
-html foot         <p />
-html foot         <center>
-html foot             <a href="http://blosxom.sourceforge.net/"><img src="http://blosxom.sourceforge.net/images/pb_blosxom.gif" border="0" /></a>
-html foot         </center>
+html foot         <div align="center">
+html foot             <a href="http://blosxom.sourceforge.net/"><img src="http://blosxom.sourceforge.net/images/pb_blosxom.gif" alt="powered by blosxom" border="0" width="90" height="33" ></a>
+html foot         </div>
 html foot     </body>
 html foot </html>
 
@@ -794,15 +791,17 @@ rss foot </rss>
 
 error content_type text/html
 
+error head <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 error head <html>
-error head <body>
-error head     <p><font color="red">Error: I'm afraid this is the first I've heard of a "$flavour" flavoured Blosxom.  Try dropping the "/+$flavour" bit from the end of the URL.</font></p>
+error head <head><title>Error: unknown Blosxom flavour "$flavour"</title></head>
+error head     <body>
+error head         <h1><font color="red">Error: unknown Blosxom flavour "$flavour"</font></h1>
+error head         <p>I'm afraid this is the first I've heard of a "$flavour" flavoured Blosxom.  Try dropping the "/+$flavour" bit from the end of the URL.</p>
 
+error story        <h3>$title</h3>
+error story        <div>$body</div> <p><a href="$url/$yr/$mo_num/$da#fn.$default_flavour">#</a></p>
 
-error story <p><b>$title</b><br />
-error story $body <a href="$url/$yr/$mo_num/$da#fn.$default_flavour">#</a></p>
-
-error date <h3>$dw, $da $mo $yr</h3>
+error date         <h2>$dw, $da $mo $yr</h2>
 
 error foot     </body>
 error foot </html>

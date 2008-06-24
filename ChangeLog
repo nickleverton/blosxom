@@ -7,6 +7,7 @@ v2.0.3
 	* added support for external config file via BLOSXOM_CONFIG_DIR 
 	  and/or BLOSXOM_CONFIG_FILE environment variables
 	* added support for $plugin_list plugin config file
+    * made the default templates conforming to HTML 4.01
 
 v2.0.2
 	* fixed path_info to have correct extension in static mode (bug
