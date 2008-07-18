@@ -8,6 +8,12 @@ v2.0.3
 	  and/or BLOSXOM_CONFIG_FILE environment variables
 	* added support for $plugin_list plugin config file
     * made the default templates conforming to HTML 4.01
+    * added a testsuite for blosxom
+    * added an encoding setting, defaulting to UTF-8
+    * added support for configuration files and therefore blosxom farms
+      (based on the Debian config file patch)
+    * many small improvements
+    * some code refactoring (including a .perltidyrc)
 
 v2.0.2
 	* fixed path_info to have correct extension in static mode (bug
