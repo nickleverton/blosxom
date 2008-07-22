@@ -15,7 +15,7 @@ Content-Type: text/xml; charset=ISO-8859-1
     <pubDate>Wed, 19 Jul 2006 22:54:00 +0000</pubDate>
     <link>http://localhost/2006/07/19#1</link>
     <category></category>
-    <guid isPermaLink="false">/1</guid>
+    <guid isPermaLink="true">http://localhost/1</guid>
     <description>Lorem ipsum dolor sit amet ipso facto.Lorem ipsum dolor sit amet ipso
 facto.Lorem ipsum dolor sit amet ipso facto. Lorem ipsum dolor sit
 amet ipso facto.Lorem ipsum dolor sit amet ipso facto. 
