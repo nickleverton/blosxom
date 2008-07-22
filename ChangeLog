@@ -7,6 +7,7 @@ v2.1.0
 	* added support for external config file via BLOSXOM_CONFIG_DIR 
 	  and/or BLOSXOM_CONFIG_FILE environment variables
 	* added support for $plugin_list plugin config file
+    * fixed some RSS escaping issues
     * made the default templates conforming to HTML 4.01
     * added a testsuite for blosxom
     * added an encoding setting, defaulting to UTF-8
