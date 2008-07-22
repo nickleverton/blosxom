@@ -673,6 +673,9 @@ sub generate {
                 my $escape_re = join '|' => keys %escape;
                 $title =~ s/($escape_re)/$escape{$1}/g;
                 $body  =~ s/($escape_re)/$escape{$1}/g;
+                $url   =~ s/($escape_re)/$escape{$1}/g;
+                $path  =~ s/($escape_re)/$escape{$1}/g;
+                $fn    =~ s/($escape_re)/$escape{$1}/g;
             }
 
             $story = &$interpolate($story);
