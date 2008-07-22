@@ -660,7 +660,9 @@ sub generate {
                 }
             }
 
-            if ( $encode_xml_entities && $content_type =~ m{\bxml\b} ) {
+            if ( $encode_xml_entities &&
+                 $content_type =~ m{\bxml\b} &&
+                 $content_type !~ m{\bxhtml\b} ) {
                 # Escape special characters inside the <link> container
 
                 # The following line should be moved more towards to top for
