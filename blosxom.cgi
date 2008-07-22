@@ -79,7 +79,7 @@ $static_entries = 0;
 # --------------------------------
 
 use vars
-    qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info_full $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others $encode_xml_entities !;
+    qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info_full $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others $encode_xml_entities $content_type !;
 
 use strict;
 use FileHandle;
@@ -436,7 +436,7 @@ if (    !$ENV{GATEWAY_INTERFACE}
             mkdir "$static_dir/$p", 0755
                 unless ( -d "$static_dir/$p" or $p =~ /\.$file_extension$/ );
             foreach $flavour (@static_flavours) {
-                my $content_type
+                $content_type
                     = ( &$template( $p, 'content_type', $flavour ) );
                 $content_type =~ s!\n.*!!s;
                 my $fn = $p =~ m!^(.+)\.$file_extension$! ? $1 : "$p/index";
@@ -473,7 +473,7 @@ if (    !$ENV{GATEWAY_INTERFACE}
 
 # Dynamic
 else {
-    my $content_type = ( &$template( $path_info, 'content_type', $flavour ) );
+    $content_type = ( &$template( $path_info, 'content_type', $flavour ) );
     $content_type =~ s!\n.*!!s;
 
     $content_type =~ s/(\$\w+(?:::\w+)*)/"defined $1 ? $1 : ''"/gee;
@@ -751,7 +751,7 @@ html content_type text/html; charset=$blog_encoding
 html head <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 html head <html>
 html head     <head>
-html head         <meta http-equiv="content-type" content="text/html;charset=$blog_encoding" >
+html head         <meta http-equiv="content-type" content="$content_type" >
 html head         <link rel="alternate" type="application/rss+xml" title="RSS" href="$url/index.rss" >
 html head         <title>$blog_title $path_info_da $path_info_mo $path_info_yr</title>
 html head     </head>
