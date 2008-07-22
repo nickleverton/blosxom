@@ -793,7 +793,7 @@ rss story     <title>$title</title>
 rss story     <pubDate>$dw, $da $mo $yr $ti:00 $utc_offset</pubDate>
 rss story     <link>$url/$yr/$mo_num/$da#$fn</link>
 rss story     <category>$path</category>
-rss story     <guid isPermaLink="false">$path/$fn</guid>
+rss story     <guid isPermaLink="true">$url$path/$fn</guid>
 rss story     <description>$body</description>
 rss story   </item>
 
