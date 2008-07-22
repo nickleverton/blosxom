@@ -21,10 +21,10 @@ v2.1.0
 
 v2.0.2
 	* fixed path_info to have correct extension in static mode (bug
-	1368882)
+	  1368882)
 	* fixed filtering bug in static mode (bug 1356997)
 	* changed DATA section template parsing to allow newlines for
-	greater readability, and to allow empty templates.
+	  greater readability, and to allow empty templates.
 	* work-around for bug in CGI::url() when using SSI
 
 v2.0.1
