@@ -667,7 +667,8 @@ sub generate {
                     '<' => '&lt;',
                     '>' => '&gt;',
                     '&' => '&amp;',
-                    '"' => '&quot;'
+                    '"' => '&quot;',
+                    "'" => '&apos;'
                 );
                 my $escape_re = join '|' => keys %escape;
                 $title =~ s/($escape_re)/$escape{$1}/g;
