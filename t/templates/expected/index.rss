@@ -14,7 +14,7 @@ Content-Type: text/xml; charset=UTF-8
         <webMaster>author@example.com (A. U. Thor)</webMaster>
         <pubDate>Sun, 11 Nov 2007 11:11:00 +0000</pubDate>
         <language>en</language>
-        <generator>blosxom 2.0.2</generator>
+        <generator>blosxom 2.1.0</generator>
         <atom:link href="http://localhost/index.rss" rel="self" type="application/rss+xml" />
         <sy:updatePeriod>hourly</sy:updatePeriod>
         <sy:updateFrequency>1</sy:updateFrequency>

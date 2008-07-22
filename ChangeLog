@@ -1,4 +1,4 @@
-v2.0.3
+v2.1.0
     * unescape url returned from CGI.pm to match PATH_INFO escaping
     * redo path_info handling with much stricter date tests
     * added support for multiple plugin directories using $plugin_path

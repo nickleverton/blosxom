@@ -6,7 +6,7 @@
     <description>Yet another Blosxom weblog.</description>
     <language>en</language>
     <docs>http://blogs.law.harvard.edu/tech/rss</docs>
-    <generator>blosxom/2.0.2</generator>
+    <generator>blosxom/2.1.0</generator>
 
   <item>
     <title>Lorem ipsum</title>

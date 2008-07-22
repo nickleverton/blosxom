@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest <rael@oreilly.com>
-# Version: 2.0.2
+# Version: 2.1.0
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -88,7 +88,7 @@ use File::stat;
 use Time::Local;
 use CGI qw/:standard :netscape/;
 
-$version = "2.0.2";
+$version = "2.1.0";
 
 # Should I encode entities for xml content-types? (plugins can turn this off if they do it themselves)
 $encode_xml_entities = 1;
