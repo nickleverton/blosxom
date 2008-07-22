@@ -661,6 +661,15 @@ sub generate {
             }
 
             if ( $encode_xml_entities && $content_type =~ m{\bxml\b} ) {
+                # Escape special characters inside the <link> container
+
+                # The following line should be moved more towards to top for
+                # performance reasons -- Axel Beckert, 2008-07-22
+                my $url_escape_re = qr([^-/a-zA-Z0-9:._]);
+
+                $url   =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
+                $path  =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
+                $fn    =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
 
                 # Escape <, >, and &, and to produce valid RSS
                 my %escape = (
