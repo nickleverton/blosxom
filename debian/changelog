@@ -1,0 +1,278 @@
+blosxom (2.1.0-1) unstable; urgency=low
+
+  * New upstream release which did incorporate all patches and in parts also
+    improved them. Wooh.
+  * Added NEWS.Debian entry about the most important changes triggered by
+    that.
+  * Fixed/Updated copyright informations.
+  * Install now available upstream ChangeLog.
+  * Added watch file.
+  * Moved timezone plugin to /etc/blosxom/plugins-available so people can
+    symlink if they like but are not forced to use it (closes: #237018)
+  * Added new 00RssLimit plugin, enabled by default, with limited to 10
+    entries in RSS flavours, no change for others (closes: #373570)
+  * Generate conffiles file automatically to not miss anything
+  * Changed postrm symlink cleanup to cleaning every symlink in the flavours
+    dir (Closes: #454942, #486924)
+  * Changed postinst script to also cleanup flavour symlinks which aren't
+    shipped anymore.
+  * Changed postrm to only do the cleanup when the directory still exists,
+    thanks to Carsten Hey for pointing it out.
+  * Bumped Standards-Version to 3.8.0:
+    - Added Homepage: to control file.
+  * Removed debian/compat which wasn't used anymore anyway.
+  * Fixed a typo in the former changelog entry.
+
+ -- Gerfried Fuchs <rhonda@debian.at>  Thu, 24 Jul 2008 21:14:56 +0200
+
+blosxom (2.0-15) unstable; urgency=low
+
+  * The "is it this time of the year again..." release.
+  * Set myself as lone maintainer.
+  * Remove debhelper stuff.
+  * Remove debconf handling for upgrades since before sarge release
+    (closes: #388830, #313164, #422247, #420956)
+  * Fixed image URL in cgi script (closes: #406445)
+  * Pulled fix for xml breakage from new sf.net upstream release
+    (closes: #280912)
+  * Fixed postrm (closes: #372480)
+  * debian/rules: Removed some cruft.
+  * Use ctime from POSIX instead of Time::localtime which seems to break
+    localtime()'s $isdst which is needed to fix the timezone handling for
+    nice_date (closes: #233403)
+  * Get rid of param("-f") and replace it by more flexible usable
+    $ENV{BLOSXOM_CONFIG_FILE} (closes: #423441, #234309)
+  * Add a NEWS.Debian file about these changes.
+
+ -- Gerfried Fuchs <rhonda@debian.at>  Fri, 27 Jul 2007 16:53:14 +0200
+
+blosxom (2.0-14) unstable; urgency=low
+
+  alfie:
+  * Added debconf translations:
+    Czech by Miroslav Kure (closes: #315832)
+    Vietnamese by Clytie Siddall (closes: #313163)
+    Swedish by Daniel Nylander (closes: #339787)
+    Spanish by César Gómez Martín (closes: #333890)
+  * Updated URLs in copyright file, noticed by Alexander Schmehl
+    (closes: #366326)
+  * Added | debconf-2.0 alternative (closes: #331763)
+  * Set debhelper compat to 5 and bumped standards version to 3.7.2.
+
+ -- Gerfried Fuchs <alfie@debian.org>  Thu, 25 May 2006 02:10:23 -0500
+
+blosxom (2.0-13) unstable; urgency=medium
+
+  * The "last minute flight to sarge" release
+  alfie:
+  * Updated ja debconf translation from Hideki Yamane (closes: #311173)
+
+ -- Gerfried Fuchs <alfie@debian.org>  Tue, 31 May 2005 14:49:17 +0200
+
+blosxom (2.0-12) unstable; urgency=high
+
+  * The "... and some other parts" release
+  alfie:
+  * Don't make the flavour symlinks symlinks to themselves but instead to the
+    real files (closes: #303963)
+  * Remove /var/www/blosxom/flavours from the package, it isn't used
+    anymore.
+  * Changed dpkg --compare-versions from lt-nl to lt in postinst. We want to
+    create the symlinks on new installs, too.
+  * Remove flavour symlinks again on purge.
+
+ -- Gerfried Fuchs <alfie@debian.org>  Fri, 15 Apr 2005 08:31:46 +0200
+
+blosxom (2.0-11) unstable; urgency=low
+
+  * The "you'll always miss some part of testing" release
+  alfie:
+  * Added /var/lib/blosxom/data/flavours directory to package and use the
+    correct path in postinst to let the postinst symlink stuff actually work
+    *sighs* (closes: #302168)
+  * Make the backup of old data not fail (closes: #302277)
+  * Changed /var/lib/blosxom/static to www-data too, to allow the cgi script
+    be triggering static rendering.
+  * Added an entry about the new setup to README.Debian.
+  * Updated fr debconf translation from Nicolas Bertolissio (closes: #302243)
+
+ -- Gerfried Fuchs <alfie@debian.org>  Fri, 01 Apr 2005 07:51:51 +0200
+
+blosxom (2.0-10) unstable; urgency=low
+
+  alfie:
+  * Really break blosxom, for the sake of a clean package for the release:
+    - Changed datadir to /var/lib/blosxom/data (closes: #230797)
+    - Changed plugin_dir to /etc/blosxom/plugins (closes: #265021)
+    - Save old plugins to /root/blosxom.XXXXXX to not loose them.
+    - Changed plugin_state_dir to /var/lib/blosxom/state
+    - Changed static_dir to /var/lib/blosxom/static
+    - Added critical debconf note about this all.
+    - Updated manual page with that information.
+  * Move DH_COMPAT level to debian/compat.
+  * Lowercased first letter of short description.
+  * Added pt_BR debconf translation from André Luís Lopes (closes: #297061)
+  * Fixed the most annoying flavour flaws, updated the URL.
+
+ -- Gerfried Fuchs <alfie@debian.org>  Tue, 29 Mar 2005 13:34:49 +0200
+
+blosxom (2.0-9) unstable; urgency=high
+
+  alfie:
+  * Added debconf translations:
+    French by Nicolas Bertolissio (Closes: #266941)
+    Japanese by Hideki Yamane (Closes: #270469)
+    Thanks!
+  * Fix generated HTML, reported by Mattia Monga (Closes: #270780)
+  * Sorry for the delayed upload -- I thought I had done this in ages... This
+    is the timestamp for when I've done it:  Thu, 18 Nov 2004 19:32:53 +0100
+    *blushes*
+
+ -- Gerfried Fuchs <alfie@debian.org>  Wed, 02 Feb 2005 13:26:28 +0100
+
+blosxom (2.0-8) unstable; urgency=low
+
+  alfie:
+  * New co-maintainer: me, myself and I.
+  * Moved dependency on httpd to Recommends (Closes: #260932)
+  * Switched to po-debconf (Closes: #239866)
+  * Added German debconf translation done by myself.
+
+ -- Gerfried Fuchs <alfie@debian.org>  Tue, 10 Aug 2004 12:46:25 +0200
+
+blosxom (2.0-7) unstable; urgency=low
+
+  * New maintainer. Thanks to Dirk Eddelbuettel for maintaining it before
+    me.
+  * pb_blosxom.gif: Moved out of /usr/share/apache/icons, into
+    /var/www/blosxom/images in case apache is not the webserver.
+    (Closes: #229284)
+
+ -- Pascal Hakim <pasc@debian.org>  Sat, 31 Jan 2004 16:59:08 +1100
+
+blosxom (2.0-6) unstable; urgency=low
+
+  * blosxom.cgi: Undo blunder created manually applying last patch
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Fri, 16 Jan 2004 20:43:56 -0600
+
+blosxom (2.0-5) unstable; urgency=low
+
+  * blosxom.cgi: Applied patch by Alexander Zangerl to support an new
+    command-line option '-f conffile' (Closes: #227891)
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Thu, 15 Jan 2004 21:50:07 -0600
+
+blosxom (2.0-4) unstable; urgency=low
+
+  * plugins/timezone: Version 0.0.1 by Raffi Krikorian added from
+    Blosxom's plugin registry; this sets the $ENV{TZ} variable to a
+    configurable string
+  * blosxom.cgi: Added POSIX::tzset() call and assignment of POSIX::tzname()
+    to get the timezone name into the $tz variable
+  * blosxom.cgi: Modify rss expression for story to show $tz instead of GMT
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Wed,  7 Jan 2004 19:27:32 -0600
+
+blosxom (2.0-3) unstable; urgency=low
+
+  * debian/blosxom.7: Correct location of configuration file in the
+    contributed manual page. (Closes: #226189)
+  * blosxom.cgi: Applied patch by Ivo Timmerman and Mark Howard posted on
+    http://people.debian.org/~keybuk/planetdebian/ to add timestamps to the
+    the rss feed
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Wed,  7 Jan 2004 15:19:40 -0600
+
+blosxom (2.0-2) unstable; urgency=low
+
+  * debian/blosxom.conf: Change $plugin_state_dir to /var/lib/blosxom
+    as the /usr/ partition could potentially be mounted read-only
+  * debian/rules: Fix $plugin_state_dir owner/group/mode (Closes: #210667)
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Fri, 12 Sep 2003 20:35:06 -0500
+
+blosxom (2.0-1) unstable; urgency=low
+
+  * Upgraded to new major release
+  * Derek Laventure <derek@openflows.org> provided help with the 2.0 release :
+    - Added 'config' and 'flavourdir' plugins to main package
+    - plugin/flavourdir: Set $fallback_to_datadir=1
+    - debian/control: Updated Description for blosxom 2.0 series
+    - debian/control: Build-Depends  for debhelper now >>4.0.0
+    - debian/README.Debian: Provide some info on plugins
+  * Dirk Eddelbuettel
+    - Build blosxom_2.0.orig.tar.gz from the upstream files blosxom.zip and
+      blosxom_flavour_sampler.zip as well as the two included plugins
+    - blosxom.cgi: Re-applied small patches for configuration in /etc/
+      as well as source URL for pb_blosxom.gif in the local /icons dir
+    - debian/rules: Also install flavours/ examples
+    - debian/README.Debian: Updated
+    - debian/copyright: Added short comment re upstream locations
+    - debian/control: Upgraded Standards-Versuin to 3.6.0
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Wed, 23 Jul 2003 23:01:00 -0500
+
+blosxom (1.2-2) unstable; urgency=low
+
+  * blosxom.cgi: Read configuration file from /etc/blosxom/blosxom.conf,
+    and not from /etc/default/blosxom (Closes: #192947)
+  * debian/rules: Use /etc/blosxom/blosxom.conf, not /etc/default/blosxom
+  * debian/preinst: If found, preserve previous config file as backup copy
+  * debian/template: Update location entry for config directory
+
+  * As the previous entries indicate, a config file has moved its location
+    from 1.2-1. Previous copies are preserved, but settings will have to
+    be transferred manually.
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Sun, 11 May 2003 17:30:25 -0500
+
+blosxom (1.2-1) unstable; urgency=low
+
+  * New maintainer -- thanks to Mark Nozell for the prior work on blosxom.
+  * Updated to latest stable blosxom version 1.2 (Closes: #181892)
+  * Created proper orig.tar.gz containing blosxom.cgi and pb_blosxom.gif
+  * blosxom.cgi: Added small patch to read configuration from files
+    /etc/default/blosxom and /etc/blosxom.conf, if found (Closes: #179431)
+  * blosxom.cgi: Re-applied change to load pb_blosxom.gif from local copy
+  * /etc/default/blosxom: New conffile (implicitly via debhelper)
+  * debian/{preinst,template}: Save old script to /tmp if we're upgrading from
+    an earlier version which will have stored config info in the cgi script
+  * debian/rules: Create /var/www/blosxom (Closes: #182516)
+  * debian/rules: Rewritten based on current debhelper stanza
+  * debian/copyright: Edited slightly to personal conventions
+  * debian/control: Updated maintainer, and edited Description
+  * debian/*: Delete a bunch of unused files generated by debmake
+  * debian/README.Debian: Deleted, moved note about upstream to copyright.
+  * debian/README: New location of README derived from blosxom webpage
+  * debian/blosxom.7: Corrected nroff markup.
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Sat, 15 Mar 2003 02:17:05 -0600
+
+blosxom (0.5i-4) unstable; urgency=low
+
+  * Added man page for blosxom. (closes: Bug#179432)
+
+  * Changed to depend on httpd instead of specifically apache. (closes:
+    Bug#176359)
+
+ -- Marc Nozell <marc@nozell.com>  Thu, 20 Feb 2003 12:35:02 -0500
+
+blosxom (0.5i-3) unstable; urgency=low
+
+  * Addressed lamont's packaging comments. (closes: Bug#157439)
+
+ -- Marc Nozell <marc@nozell.com>  Mon, 11 Nov 2002 12:55:02 -0500
+
+blosxom (0.5i-2) unstable; urgency=low
+
+  * At upstream author's request, included 'powered by blosxom' icon
+    and changed blosxom.cgi to use the local copy.
+
+ -- Marc Nozell <marc@nozell.com>  Mon, 11 Nov 2002 09:55:02 -0500
+
+blosxom (0.5i-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Marc Nozell <marc@nozell.com>  Sat,  9 Nov 2002 20:42:02 -0500

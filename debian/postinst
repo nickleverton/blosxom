@@ -1,0 +1,22 @@
+#!/bin/sh -e
+# postrm script for blosxom
+# copyright 2007-2008 by Gerfried Fuchs <rhonda@debian.at>
+# Licenced in the same way as blosxom itself
+
+# cleanup for old flavors that got installed by packages prior to 2.1.0
+case "$1" in
+    purge)
+	if [ -d /var/lib/blosxom/data/flavours ] ; then
+		cd /var/lib/blosxom/data/flavours
+		for i in content_type.1993 content_type.html content_type.index \
+			date.1993  date.html  date.index \
+			foot.1993  foot.html  foot.index \
+			head.1993  head.html  head.index \
+			story.1993 story.html story.index ; do
+			test ! -L $i || test ! -f $i || rm $i
+		done
+	fi
+    ;;
+esac
+
+exit 0

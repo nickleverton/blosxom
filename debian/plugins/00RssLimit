@@ -1,0 +1,94 @@
+# Blosxom Plugin: RssLimit        # vim:ft=perl:fdm=marker:
+# Author: Gerfried Fuchs <rhonda@deb.at>
+# Version: 0.2.0
+# Documentation: See the bottom of this file or type: perldoc RssLimit
+
+package RssLimit;
+
+use strict;
+
+use CGI qw(param);
+
+use vars qw(
+  $rss_num_entries
+);
+
+# --- Configurable variables -----
+
+# how many entries for rss feeds?
+$rss_num_entries = 10;
+
+# --------------------------------
+
+sub start {         # set num_entries {{{
+    if ($blosxom::flavour eq 'rss') {
+        $blosxom::num_entries = $RssLimit::rss_num_entries;
+    }
+    1;
+}   # }}}
+
+1;
+
+__END__
+{{{
+
+=head1 NAME
+
+RssLimit - blosxom plugin to limit RSS feeds tighter than others
+
+=head1 DESCRIPTION
+
+RssLimit allows you to limit your RSS feed tigher (or wider, if you so
+like) than what's displayed usual on your webpage version of your blog.
+
+=head1 CONFIGURATION
+
+The following package variables can be configured:
+
+=over 4
+
+=item C<$RssLimit:rss_num_entries>
+
+Number of entries in the RSS feed. Default is 10.
+
+=back
+
+=head1 USAGE
+
+RssLimit should propably be loaded early to not confuse other plugins
+that make use of $num_entries, like paging plugins.
+
+=head1 SEE ALSO
+
+Blosxom: L<http://blosxom.sourceforge.net/>
+
+=head1 BUGS
+
+Please address bug reports and comments to the Author.
+
+=head1 AUTHOR
+
+Gerfried Fuchs L<mailto:rhonda@deb.at>,
+L<http://rhonda.deb.at/projects/blosxom/>
+
+=head1 LICENSE
+
+Copyright (c) 2004 Gerfried Fuchs
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

@@ -1,0 +1,35 @@
+Source: blosxom
+Section: web
+Priority: optional
+Maintainer: Gerfried Fuchs <rhonda@debian.at>
+Uploaders: Axel Beckert <be@deuxchevaux.org>
+Standards-Version: 3.8.0
+Homepage: http://blosxom.sourceforge.net/
+
+Package: blosxom
+Architecture: all
+Depends: perl
+Recommends: apache | httpd
+Description: light, feature-packed weblog app with plugin extensibility
+ Blosxom (pronounced "Blossom") is a lightweight yet feature-packed
+ weblog application designed from the ground up with simplicity,
+ usability, and interoperability in mind.
+ .
+ Fundamental is its reliance upon the file system, folders and files as
+ its content database. Blosxom's weblog entries are plain text files
+ like any other. Write from the comfort of your favorite text editor
+ and hit the Save button. Create, edit, rename, and delete entries on
+ the command-line, via FTP, WebDAV, or anything else you might use to
+ manipulate your files. There's no import or export; entries are
+ nothing more complex than title on the first line, body being
+ everything thereafter. 
+ .
+ Despite its tiny footprint, Blosxom doesn't skimp on features,
+ sporting the majority of features one would find in any other Weblog
+ application.  Additionally, Blosxom 2 includes support for plugins, and
+ thus much more extensive customization.
+ .
+ Blosxom is simple, straightforward, minimalist Perl affording even the
+ dabbler an opportunity for experimentation and customization. And
+ last, but not least, Blosxom is open source and free for the taking
+ and altering.

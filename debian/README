@@ -1,0 +1,55 @@
+blosxom is...
+
+Blosxom (pronounced "Blossom") is a lightweight yet feature-packed
+weblog application designed from the ground up with simplicity,
+usability, and interoperability in mind.
+
+Fundamental is its reliance upon the file system, folders and files as
+its content database. Blosxom's weblog entries are plain text files
+like any other. Write from the comfort of your favorite text editor
+and hit the Save button. Create, edit, rename, and delete entries on
+the command-line, via FTP, WebDAV, or anything else you might use to
+manipulate your files. There's no import or export; entries are
+nothing more complex than title on the first line, body being
+everything thereafter.
+
+Despite its tiny footprint, Blosxom doesn't skimp on features,
+sporting the majority of features one would find in any other Weblog
+application.
+
+Blosxom is simple, straightforward, minimalist Perl affording even the
+dabbler an opportunity for experimentation and customization. And
+last, but not least, Blosxom is open source and free for the taking
+and altering.
+
+features...
+
+    * Absolutely FREE for the taking!
+    * Weblogging in under 15 minutes or your money back ;-)
+    * Minimal requirements means Blosxom runs just about anywhere.
+    * Write from the comfort of your favourite text editor -- be it
+      BBEdit, vi, emacs, notepad, ...
+    * Makes use of all the operating system and Web server beneath its
+      feet have to offer -- whether Mac OS X and Apache or Windows XP
+      and IIS. 
+    * Multiple Weblogs with only one Blosxom installation.
+    * Permalinks point to (aka bookmark) a particular story in the
+      context of its posting day. 
+    * By-day, by-month, and by-year "archives".
+    * Flavour via a customizable template system.
+    * RSS syndication and aggregation.
+    * Small (<= 91 lines of actual code ;-) and lightweight.
+    * Intelligent defaults.
+    * Minimalist in terms of requirements and know-how, yet
+      feature-packed and infinitely extensible. 
+
+philosophy...
+
+The design philosophy underpinning Blosxom is a focus on the nexus of
+simplicity, usability, and interoperability. Blogging should be as
+simple as typing away in your text editor of choice and hitting
+Save. Blogging should be as intuitive and second nature as working
+with files and directories. A blogging system should be extensible
+without requiring much in the way of specific know-how; it should
+interoperate with and make full use of all the operating system and
+Web server beneath its feet have to offer.
