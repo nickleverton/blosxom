@@ -1,12 +1,15 @@
+v2.1.1
+    * Added CVS Id keyword to file header.
+
 v2.1.0
     * unescape url returned from CGI.pm to match PATH_INFO escaping
     * redo path_info handling with much stricter date tests
     * added support for multiple plugin directories using $plugin_path
-	* changed plugin loading to use @INC instead of hardcoded 
-	  $plugin_dir
-	* added support for external config file via BLOSXOM_CONFIG_DIR 
-	  and/or BLOSXOM_CONFIG_FILE environment variables
-	* added support for $plugin_list plugin config file
+        * changed plugin loading to use @INC instead of hardcoded 
+          $plugin_dir
+        * added support for external config file via BLOSXOM_CONFIG_DIR 
+          and/or BLOSXOM_CONFIG_FILE environment variables
+        * added support for $plugin_list plugin config file
     * fixed several RSS and XHTML escaping issues (Closes: #1717980)
     * made the default templates conforming to HTML 4.01
       (Closes: #1609595)
@@ -20,15 +23,15 @@ v2.1.0
     * some code refactoring (including a .perltidyrc)
 
 v2.0.2
-	* fixed path_info to have correct extension in static mode (bug
-	  1368882)
-	* fixed filtering bug in static mode (bug 1356997)
-	* changed DATA section template parsing to allow newlines for
-	  greater readability, and to allow empty templates.
-	* work-around for bug in CGI::url() when using SSI
+    * fixed path_info to have correct extension in static mode (bug
+      1368882)
+    * fixed filtering bug in static mode (bug 1356997)
+    * changed DATA section template parsing to allow newlines for
+      greater readability, and to allow empty templates.
+    * work-around for bug in CGI::url() when using SSI
 
 v2.0.1
-	* Fixed XML escaping of RSS feeds
-	* Ignore editor backup files in the plugin directory
-	  (i.e. "myplugin~")
-	* Set path_info variables correctly for all static pages.
+    * Fixed XML escaping of RSS feeds
+    * Ignore editor backup files in the plugin directory (i.e.
+      "myplugin~")
+    * Set path_info variables correctly for all static pages.
