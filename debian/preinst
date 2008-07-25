@@ -40,7 +40,7 @@ install|upgrade)
 			foot.1993  foot.html  foot.index \
 			head.1993  head.html  head.index \
 			story.1993 story.html story.index ; do
-			test ! -L $i || test ! -f $i || rm $i
+			test ! -L $i || test -f $i || rm $i
 		done
 	fi
 esac
