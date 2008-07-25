@@ -9,7 +9,7 @@ blosxom (2.1.0-1) unstable; urgency=low
   * Added watch file.
   * Moved timezone plugin to /etc/blosxom/plugins-available so people can
     symlink if they like but are not forced to use it (closes: #237018)
-  * Added new 00RssLimit plugin, enabled by default, with limited to 10
+  * Added new 00RssLimit plugin, enabled by default, with limited to 5
     entries in RSS flavours, no change for others (closes: #373570)
   * Generate conffiles file automatically to not miss anything
   * Changed postrm symlink cleanup to cleaning every symlink in the flavours
@@ -23,7 +23,7 @@ blosxom (2.1.0-1) unstable; urgency=low
   * Removed debian/compat which wasn't used anymore anyway.
   * Fixed a typo in the former changelog entry.
 
- -- Gerfried Fuchs <rhonda@debian.at>  Thu, 24 Jul 2008 21:14:56 +0200
+ -- Gerfried Fuchs <rhonda@debian.at>  Fri, 25 Jul 2008 16:19:49 +0200
 
 blosxom (2.0-15) unstable; urgency=low
 

@@ -16,7 +16,7 @@ use vars qw(
 # --- Configurable variables -----
 
 # how many entries for rss feeds?
-$rss_num_entries = 10;
+$rss_num_entries = 5;
 
 # --------------------------------
 

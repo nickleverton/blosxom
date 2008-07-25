@@ -5,12 +5,22 @@ blosxom (2.1.0-1) unstable; urgency=low
     included in the blosxom script directly and the old 1993 and index
     flavours are not included anymore, to get rid of some further historical 
     annoyances with the packaging.
+
+  * MOST IMPORTANTLY: This update adds a new tag into rss feeds:
+    <guid isPermanentLink="true"> which helps to notice duplicates and not let
+    them appear again on planets. Though, for the time of switching it might
+    mean that your last entries might appear as new when planet doesn't check
+    <link> (which already should be cached) when finding <guid>. This is
+    unfortunate but not really avoidable. To limit impact a new plugin was
+    added: 00RssLimit which turns the syndicated feed in only pick up the last
+    5 entries.
+
   * The plugin timezone got disabled and gets only installed into a new
     /etc/blosxom/plugins-available directory which is the first step to the
     planned blosxom-plugins package. If you found it useful and made use of it
     just symlink it from the plugins directory.
 
- -- Gerfried Fuchs <rhonda@debian.at>  Thu, 24 Jul 2008 21:14:56 +0200
+ -- Gerfried Fuchs <rhonda@debian.at>  Fri, 25 Jul 2008 16:19:49 +0200
 
 blosxom (2.0-15) unstable; urgency=low
 
