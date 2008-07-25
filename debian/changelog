@@ -2,6 +2,7 @@ blosxom (2.1.0-1) unstable; urgency=low
 
   * New upstream release which did incorporate all patches and in parts also
     improved them. Wooh.
+  * Updated blosxom.conf with additional default values.
   * Added NEWS.Debian entry about the most important changes triggered by
     that.
   * Fixed/Updated copyright informations.
