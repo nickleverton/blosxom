@@ -32,6 +32,7 @@ install|upgrade)
 			story.1993 story.html story.index ; do
 			rm_conffile blosxom "/etc/blosxom/flavours/$i"
 		done
+		rm_conffile blosxom "/etc/blosxom/plugins/timezone"
 	fi
 	if [ -d /var/lib/blosxom/data/flavours ] ; then
 		cd /var/lib/blosxom/data/flavours
