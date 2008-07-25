@@ -1,0 +1,48 @@
+#!/bin/sh -e
+# preinst script for blosxom
+# copyright 2007-2008 by Gerfried Fuchs <rhonda@debian.at>
+# Licenced in the same way as blosxom itself
+
+rm_conffile() {
+	PKGNAME="$1"
+	CONFFILE="$2"
+	if [ -e "$CONFFILE" ]; then
+		md5sum="`md5sum \"$CONFFILE\" | sed -e \"s/ .*//\"`"
+		old_md5sum="`dpkg-query -W -f='${Conffiles}' $PKGNAME | sed -n -e \"\\\\' $CONFFILE '{s/ obsolete$//;s/.* //p}\"`"
+		if [ "$md5sum" != "$old_md5sum" ]; then
+			echo "Obsolete conffile $CONFFILE has been modified by you."
+			echo "Saving as $CONFFILE.dpkg-bak ..."
+			mv -f "$CONFFILE" "$CONFFILE".dpkg-bak
+		else
+			echo "Removing obsolete conffile $CONFFILE ..."
+			rm -f "$CONFFILE"
+		fi
+	fi
+}
+
+
+# cleanup for old flavors that got installed by packages prior to 2.1.0
+case "$1" in
+install|upgrade)
+	if dpkg --compare-versions "$2" le-nl "2.1.0-1"; then
+		for i in content_type.1993 content_type.html content_type.index \
+			date.1993  date.html  date.index \
+			foot.1993  foot.html  foot.index \
+			head.1993  head.html  head.index \
+			story.1993 story.html story.index ; do
+			rm_conffile blosxom "/etc/blosxom/flavours/$i"
+		done
+	fi
+	if [ -d /var/lib/blosxom/data/flavours ] ; then
+		cd /var/lib/blosxom/data/flavours
+		for i in content_type.1993 content_type.html content_type.index \
+			date.1993  date.html  date.index \
+			foot.1993  foot.html  foot.index \
+			head.1993  head.html  head.index \
+			story.1993 story.html story.index ; do
+			test ! -L $i || test ! -f $i || rm $i
+		done
+	fi
+esac
+
+exit 0

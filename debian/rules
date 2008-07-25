@@ -65,7 +65,7 @@ binary-indep: install
 		$(TMP)/usr/share/doc/$(PKG)/changelog.Debian
 	cd $(TMP)/usr/share/doc/$(PKG) && gzip -9 changelog.Debian NEWS.Debian
 
-	$(INSTALL_SCRIPT) debian/postinst debian/postrm $(TMP)/DEBIAN
+	$(INSTALL_SCRIPT) debian/preinst debian/postrm $(TMP)/DEBIAN
 
 	find $(TMP)/etc -type f | sed -e 's#$(TMP)##' > $(TMP)/DEBIAN/conffiles
 

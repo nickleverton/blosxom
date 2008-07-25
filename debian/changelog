@@ -14,8 +14,8 @@ blosxom (2.1.0-1) unstable; urgency=low
   * Generate conffiles file automatically to not miss anything
   * Changed postrm symlink cleanup to cleaning every symlink in the flavours
     dir (Closes: #454942, #486924)
-  * Changed postinst script to also cleanup flavour symlinks which aren't
-    shipped anymore.
+  * Added preinst script to cleanup flavour symlinks which aren't shipped
+    anymore, removed old postinst script.
   * Changed postrm to only do the cleanup when the directory still exists,
     thanks to Carsten Hey for pointing it out.
   * Bumped Standards-Version to 3.8.0:
