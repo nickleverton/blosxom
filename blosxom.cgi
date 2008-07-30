@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
-# Version: 2.1.0+dev ($Id: blosxom.cgi,v 1.80 2008/07/25 18:22:09 xtaran Exp $)
+# Version: 2.1.0+dev ($Id: blosxom.cgi,v 1.81 2008/07/30 17:52:26 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -795,7 +795,7 @@ rss story     <title>$title</title>
 rss story     <pubDate>$dw, $da $mo $yr $ti:00 $utc_offset</pubDate>
 rss story     <link>$url/$yr/$mo_num/$da#$fn</link>
 rss story     <category>$path</category>
-rss story     <guid isPermaLink="true">$url$path/$fn</guid>
+rss story     <guid isPermaLink="false">$url$path/$fn</guid>
 rss story     <description>$body</description>
 rss story   </item>
 
