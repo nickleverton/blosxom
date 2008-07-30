@@ -18,7 +18,7 @@ v2.1.1
       Blosxom manages to correctly determine the base URL, you can easily
       set $url in the config file to the correct value and no base URL
       magic happens anymore (except the removing of a trailing slash if
-      present -- as before).
+      present -- as before). Closes: #2032685
     * Added a lot of comments explaining the fixed problems and the
       remaining seldom cases where manual configuration is necessary.
 
