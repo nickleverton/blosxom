@@ -1,14 +1,14 @@
 blosxom (2.1.1-1) unstable; urgency=low
 
   * New upstream release which fixes a regression from the previous blosxom
-    2.0 version we have currently in stable.
+    2.0 version we have currently in stable (closes: #492987)
   * Add Vcs-* informations to source control file.
   * Forgot to mention in the previous upload that I added Axel Beckert as
     Co-Maintainer. Welcome on board. :)
   * Update debian/README.Debian with more current informations, especially
     related to referencing the proper URLs (closes: #492985)
 
- -- Gerfried Fuchs <rhonda@debian.at>  Wed, 06 Aug 2008 19:29:07 -0300
+ -- Gerfried Fuchs <rhonda@debian.at>  Wed, 06 Aug 2008 19:31:11 -0300
 
 blosxom (2.1.0-1) unstable; urgency=low
 
