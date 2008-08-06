@@ -8,12 +8,12 @@ blosxom (2.1.0-1) unstable; urgency=low
 
   * MOST IMPORTANTLY: This update adds a new tag into rss feeds:
     <guid isPermanentLink="true"> which helps to notice duplicates and not let
-    them appear again on planets. Though, for the time of switching it might
-    mean that your last entries might appear as new when planet doesn't check
-    <link> (which already should be cached) when finding <guid>. This is
-    unfortunate but not really avoidable. To limit impact a new plugin was
-    added: 00RssLimit which turns the syndicated feed in only pick up the last
-    5 entries.
+    them appear again for aggregators. Though, for the time of switching it
+    might mean that your last entries might appear as new when aggregators
+    (like e.g. PlanetPlanet on planet.debian.org) don't check <link> (which
+    already should be cached) when finding <guid>. This is unfortunate but not
+    really avoidable. To limit impact a new plugin was added: 00RssLimit which
+    turns the syndicated feed in only pick up the last 5 entries.
 
   * The plugin timezone got disabled and gets only installed into a new
     /etc/blosxom/plugins-available directory which is the first step to the
