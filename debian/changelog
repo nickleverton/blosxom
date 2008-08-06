@@ -1,3 +1,10 @@
+blosxom (2.1.1-1) unstable; urgency=low
+
+  * New upstream release which fixes a regression from the previous blosxom
+    2.0 version we have currently in stable.
+
+ -- Gerfried Fuchs <rhonda@debian.at>  Wed, 06 Aug 2008 18:44:21 -0300
+
 blosxom (2.1.0-1) unstable; urgency=low
 
   * New upstream release which did incorporate all patches and in parts also
