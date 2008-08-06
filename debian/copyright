@@ -16,7 +16,7 @@ Upstream Authors: The Blosxom Development Team (2005-2008)
 Copyright:
 ==========
     blosxom.cgi:
-    Copyright 2003, Rael Dornfest
+    Copyright 2002-2003, Rael Dornfest
     Copyright 2005-2008 The Blosxom Development Team
 
     plugins/00RssLimit:
