@@ -5,8 +5,10 @@ blosxom (2.1.1-1) unstable; urgency=low
   * Add Vcs-* informations to source control file.
   * Forgot to mention in the previous upload that I added Axel Beckert as
     Co-Maintainer. Welcome on board. :)
+  * Update debian/README.Debian with more current informations, especially
+    related to referencing the proper URLs (closes: #492985)
 
- -- Gerfried Fuchs <rhonda@debian.at>  Wed, 06 Aug 2008 18:50:58 -0300
+ -- Gerfried Fuchs <rhonda@debian.at>  Wed, 06 Aug 2008 19:29:07 -0300
 
 blosxom (2.1.0-1) unstable; urgency=low
 
