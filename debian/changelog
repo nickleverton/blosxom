@@ -8,12 +8,13 @@ blosxom (2.1.1-1) unstable; urgency=low
     Co-Maintainer. Welcome on board. :)
   * Update debian/README.Debian with more current informations, especially
     related to referencing the proper URLs (closes: #492985)
+  * Add the moved $encode_xml_entities config option to blosxom.conf, too.
 
   [ Axel Beckert ]
   * Clearified debian/NEWS.Debian with respect to rss aggregators.
   * Fix copyright year information for Rael on blosxom.cgi.
 
- -- Gerfried Fuchs <rhonda@debian.at>  Wed, 06 Aug 2008 20:37:13 -0300
+ -- Gerfried Fuchs <rhonda@debian.at>  Thu, 07 Aug 2008 17:15:31 -0300
 
 blosxom (2.1.0-1) unstable; urgency=low
 
