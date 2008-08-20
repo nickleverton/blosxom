@@ -1,3 +1,9 @@
+blosxom (2.1.0-2) unstable; urgency=low
+
+  * Corrected Axel's email address in Uploaders field, sorry.
+
+ -- Gerfried Fuchs <rhonda@debian.at>  Wed, 20 Aug 2008 13:44:35 +0200
+
 blosxom (2.1.0-1) unstable; urgency=low
 
   * New upstream release which did incorporate all patches and in parts also
