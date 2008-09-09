@@ -4,12 +4,10 @@ blosxom for Debian
 The setup of blosxom has been recently revised to support more flexible
 setups. The plugins should now be stored below /etc/blosxom/plugins. If you
 want to disable a plugin you don't have to remove it but can just rename it to
-a filename that ends in "_" (e.g. "mv timezone timezone_").
+a filename that ends in "_" (e.g. "mv flavourdir flavourdir_").
 
 The data files has to be placed in /var/lib/blosxom/data including the flavours
-in subdirectories below the appropriate blog level. The default flavours are
-symlinked to their corresponding /etc/blosxom/flavours files -- if you want to
-change them you have to change them there.
+in subdirectories below the appropriate blog level.
 
  -- Gerfried Fuchs <alfie@debian.org>  Fri, 01 Apr 2005 07:45:57 +0200
 
@@ -21,12 +19,12 @@ configuration variables may need to be set.
 
 The plugins included are:
 
-http://raelity.org/apps/blosxom/downloads/plugins/config
-http://raelity.org/apps/blosxom/downloads/plugins/flavourdir
+http://blosxom.cvs.sourceforge.net/blosxom/blosxom2-plugins/general/config
+http://blosxom.cvs.sourceforge.net/blosxom/blosxom2-plugins/general/flavourdir
 
 For more plugins, check out:
 
-http://raelity.org/apps/blosxom/plugins
-http://www.blosxom.com/plugins/
+http://blosxom.cvs.sourceforge.net/blosxom/blosxom2-plugins/
+http://blosxom.ookee.com/blog/plugins/registry/v2/listing.html
 
  -- Dirk Eddelbuettel <edd@debian.org>, Wed Jul 23 22:51:16 2003

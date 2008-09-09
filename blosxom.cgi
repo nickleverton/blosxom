@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
 # Blosxom
-# Author: Rael Dornfest (2003), The Blosxom Development Team (2005-2008)
-# Version: 2.1.0
+# Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
+# Version: 2.1.1 ($Id: blosxom.cgi,v 1.83 2008/07/30 22:27:02 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -76,6 +76,9 @@ $static_password = "";
 # 0 = no, 1 = yes
 $static_entries = 0;
 
+# Should I encode entities for xml content-types? (plugins can turn this off if they do it themselves)
+$encode_xml_entities = 1;
+
 # --------------------------------
 
 use vars
@@ -88,10 +91,7 @@ use File::stat;
 use Time::Local;
 use CGI qw/:standard :netscape/;
 
-$version = "2.1.0";
-
-# Should I encode entities for xml content-types? (plugins can turn this off if they do it themselves)
-$encode_xml_entities = 1;
+$version = "2.1.1";
 
 # Load configuration from $ENV{BLOSXOM_CONFIG_DIR}/blosxom.conf, if it exists
 my $blosxom_config;
@@ -142,20 +142,39 @@ my $fh = new FileHandle;
 );
 @num2month = sort { $month2num{$a} <=> $month2num{$b} } keys %month2num;
 
-# Use the stated preferred URL or figure it out automatically
-$url ||= url( -path_info => 1 );
-# Unescape %XX hex codes (from URI::Escape::uri_unescape)
-$url =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;      
-$url =~ s/^included:/http:/ if $ENV{SERVER_PROTOCOL} eq 'INCLUDED';
+# Use the stated preferred URL or figure it out automatically. Set
+# $url manually in the config section above if CGI.pm doesn't guess
+# the base URL correctly, e.g. when called from a Server Side Includes
+# document or so.
+unless ($url) {
+    $url = url();
 
-# NOTE: Since v3.12, it looks as if CGI.pm misbehaves for SSIs and
-# always appends path_info to the url. To fix this, we always
-# request an url with path_info, and always remove it from the end of the
-# string.
-my $pi_len = length $ENV{PATH_INFO};
-my $might_be_pi = substr( $url, -$pi_len );
-substr( $url, -length $ENV{PATH_INFO} ) = ''
-    if $might_be_pi eq $ENV{PATH_INFO};
+    # Unescape %XX hex codes (from URI::Escape::uri_unescape)
+    $url =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;      
+
+    # Support being called from inside a SSI document
+    $url =~ s/^included:/http:/ if $ENV{SERVER_PROTOCOL} eq 'INCLUDED';
+
+    # Remove PATH_INFO if it is set but not removed by CGI.pm. This
+    # seems to happen when used with Apache's Alias directive or if
+    # called from inside a Server Side Include document. If that
+    # doesn't help either, set $url manually in the configuration.
+    $url =~ s/\Q$ENV{PATH_INFO}\E$// if defined $ENV{PATH_INFO};
+
+    # NOTE:
+    #
+    # There is one case where this code does more than necessary, too:
+    # If the URL requested is e.g. http://example.org/blog/blog and
+    # the base URL is correctly determined as http://example.org/blog
+    # by CGI.pm, then this code will incorrectly normalize the base
+    # URL down to http://example.org, because the same string as
+    # PATH_INFO is part of the base URL, too. But this is such a
+    # seldom case and can be fixed by setting $url in the config file,
+    # too.
+}
+
+# The only modification done to a manually set base URL is to strip
+# a trailing slash if present.
 
 $url =~ s!/$!!;
 
@@ -795,7 +814,7 @@ rss story     <title>$title</title>
 rss story     <pubDate>$dw, $da $mo $yr $ti:00 $utc_offset</pubDate>
 rss story     <link>$url/$yr/$mo_num/$da#$fn</link>
 rss story     <category>$path</category>
-rss story     <guid isPermaLink="true">$url$path/$fn</guid>
+rss story     <guid isPermaLink="false">$url$path/$fn</guid>
 rss story     <description>$body</description>
 rss story   </item>
 
