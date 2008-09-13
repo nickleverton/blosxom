@@ -215,7 +215,7 @@ shift @path_info;
 # Flavour specified by ?flav={flav} or index.{flav}
 $flavour = '';
 if (! ($flavour = param('flav'))) {
-    if ( $path_info[$#path_info] =~ /(.+)\.(.+)$/ ) {
+    if ( @path_info && $path_info[$#path_info] =~ /(.+)\.(.+)$/ ) {
        $flavour = $2;
         pop @path_info if $1 eq 'index';
     }
@@ -249,8 +249,9 @@ if ($path_info[0] && $path_info[0] =~ /^(19|20)\d{2}$/) {
 # Add remaining path elements to $path_info
 $path_info .= '/' . join('/', @path_info);
 
-# Strip spurious slashes
-$path_info =~ s!(^/*)|(/*$)!!g;
+# Strip leading and trailing slashes from remainder
+$path_info =~ s:^/+::g;
+$path_info =~ s:/+$::g;
 
 # Define standard template subroutine, plugin-overridable at Plugins: Template
 $template = sub {
@@ -285,7 +286,6 @@ $template = sub {
     }
 };
 
-# put_template still used by some plugins that haven't yet been updated to blosxom 2.1.x
 $put_template = sub {
     my ( $chunk, $flavour, $template ) = @_;
 
@@ -618,7 +618,7 @@ sub generate {
                 if $files{"$datadir/$currentdir"};
         }
         else {
-            $currentdir =~ s:/index\..+$::;
+            $currentdir =~ s!/index\..+$!!;
         }
 
         # Define a default sort subroutine
