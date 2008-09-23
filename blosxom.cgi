@@ -96,10 +96,12 @@ $encode_xml_entities = 1;
 use FileHandle;
 use File::Find;
 use File::stat;
+use HTML::Entities;
 use Time::Local;
+use URI::Escape;
 use CGI qw/:standard :netscape/;
 
-$version = "2.1.1+njl";
+$version = "2.1.1+njl.1";
 
 # Load configuration from $ENV{BLOSXOM_CONFIG_DIR}/blosxom.conf, if it exists
 my $blosxom_config;
@@ -643,7 +645,7 @@ sub generate {
 
         foreach my $path_file ( &$sort( \%f, \%others ) ) {
             last if $ne <= 0 && $date !~ /\d/;
-            use vars qw/ $path $fn /;
+            use vars qw/ $path $path_uri $fn $fn_uri /;
             ( $path, $fn )
                 = $path_file =~ m!^$datadir/(?:(.*)/)?(.*)\.$file_extension!;
 	    $path = "" unless defined $path;
@@ -654,6 +656,9 @@ sub generate {
 
             # Prepend a slash for use in templates only if a path exists
             $path &&= "/$path";
+
+	    $path_uri = uri_escape( encode_entities($path, q/<>&?"'/ ), ' ' );
+	    $fn_uri   = uri_escape( encode_entities($fn,   q/<>&?"'/ ), ' ' );
 
             # Date fiddling for by-{year,month,day} archive views
             use vars
