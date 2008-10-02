@@ -14,7 +14,7 @@ package blosxom;
 # --- Configurable variables -----
 
 use vars
-    qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $put_template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info_full $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others $encode_xml_entities $content_type !;
+    qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $load_templates $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info_full $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others $encode_xml_entities $content_type !;
 
 # What's this blog's title?
 $blog_title = "My Weblog";
@@ -97,11 +97,12 @@ use FileHandle;
 use File::Find;
 use File::stat;
 use HTML::Entities;
+use IO::Wrap;
 use Time::Local;
 use URI::Escape;
 use CGI qw/:standard :netscape/;
 
-$version = "2.1.2+njl";
+$version = "2.1.2+njl.1";
 
 # Load configuration from $ENV{BLOSXOM_CONFIG_DIR}/blosxom.conf, if it exists
 my $blosxom_config;
@@ -305,21 +306,31 @@ $template = sub {
     }
 };
 
-$put_template = sub {
-    my ( $chunk, $flavour, $template ) = @_;
 
-    $blosxom::template{$flavour}{$chunk} = $template;
-    # print STDERR "templ put: $flavour, $chunk, ". $blosxom::template{$flavour}{$chunk};
+$load_templates = sub {
+  local $_;
+  my $fh = wraphandle( shift @_ );
+  my( $last_flavour, $last_chunk );
+  while ($_ = $fh->getline) {
+    last if /^__(?:DATA|END)__$/;
+    next if /^\s*(?:#|$)/;	# ignore template comments + blank lines
+    my($flavour, $chunk, $txt) = split( /\s+/, $_, 3 );
+    next unless defined $txt;
+    # print STDERR "load_template: $flavour, $chunk, $txt";
+    $txt =~ s/\\n/\n/mg;
+    if( ! defined $last_flavour || $flavour ne $last_flavour || $chunk ne $last_chunk ) {
+      $template{$flavour}{$chunk} = $txt;
+      $last_flavour = $flavour;
+      $last_chunk   = $chunk;
+    } else {
+      $template{$flavour}{$chunk} .= $txt;
+    }
+  }
 };
 
-# Bring in the templates
+# Bring in the default templates
 %template = ();
-while (<DATA>) {
-    last if /^(__END__)$/;
-    my ( $ct, $comp, $txt ) = /^(\S+)\s(\S+)(?:\s(.*))?$/ or next;
-    $txt =~ s/\\n/\n/mg;
-    $template{$ct}{$comp} .= $txt . "\n";
-}
+$load_templates->(\*DATA);
 
 # Plugins: Start
 my $path_sep = $^O eq 'MSWin32' ? ';' : ':';
