@@ -3,8 +3,9 @@ blosxom (2.1.2-1) unstable; urgency=high
   * New upstream release: Fixes Cross-Site Scripting (XSS) vulnerability with
     respect to unknown flavours (CVE-2008-2236) (closes: #500873)
   * Corrected Axel's email address in Uploaders field, sorry.
+  * Corrected Vcs-Browser entry in debian/control.
 
- -- Gerfried Fuchs <rhonda@debian.at>  Thu, 02 Oct 2008 12:57:01 +0200
+ -- Gerfried Fuchs <rhonda@debian.at>  Thu, 02 Oct 2008 13:38:39 +0200
 
 blosxom (2.1.1-1) unstable; urgency=low
 
