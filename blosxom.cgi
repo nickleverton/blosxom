@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
-# Version: 2.1.1 ($Id: blosxom.cgi,v 1.83 2008/07/30 22:27:02 xtaran Exp $)
+# Version: 2.1.1 ($Id: blosxom.cgi,v 1.84 2008/10/02 01:05:34 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -213,6 +213,23 @@ if (! ($flavour = param('flav'))) {
     }
 }
 $flavour ||= $default_flavour;
+
+# Fix XSS in flavour name (CVE-2008-2236)
+$flavour = blosxom_html_escape($flavour);
+
+sub blosxom_html_escape {
+  my $string = shift;
+  my %escape = (
+                '<' => '&lt;',
+                '>' => '&gt;',
+                '&' => '&amp;',
+                '"' => '&quot;',
+                "'" => '&apos;'
+                );
+  my $escape_re = join '|' => keys %escape;
+  $string =~ s/($escape_re)/$escape{$1}/g;
+  $string;
+}
 
 # Global variable to be used in head/foot.{flavour} templates
 $path_info = '';
