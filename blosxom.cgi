@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
-# Version: 2.1.2 ($Id: blosxom.cgi,v 1.85 2008/10/02 01:09:41 xtaran Exp $)
+# Version: 2.1.2 ($Id: blosxom.cgi,v 1.86 2008/11/11 10:37:16 alfie Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -710,19 +710,11 @@ sub generate {
                 $fn    =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
 
                 # Escape <, >, and &, and to produce valid RSS
-                my %escape = (
-                    '<' => '&lt;',
-                    '>' => '&gt;',
-                    '&' => '&amp;',
-                    '"' => '&quot;',
-                    "'" => '&apos;'
-                );
-                my $escape_re = join '|' => keys %escape;
-                $title =~ s/($escape_re)/$escape{$1}/g;
-                $body  =~ s/($escape_re)/$escape{$1}/g;
-                $url   =~ s/($escape_re)/$escape{$1}/g;
-                $path  =~ s/($escape_re)/$escape{$1}/g;
-                $fn    =~ s/($escape_re)/$escape{$1}/g;
+                $title = blosxom_html_escape($title);
+                $body  = blosxom_html_escape($body);
+                $url   = blosxom_html_escape($url);
+                $path  = blosxom_html_escape($path);
+                $fn    = blosxom_html_escape($fn);
             }
 
             $story = &$interpolate($story);
