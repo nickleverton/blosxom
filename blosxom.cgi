@@ -2,11 +2,61 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
-# Version: 2.1.2 ($Id: blosxom.cgi,v 1.86 2008/11/11 10:37:16 alfie Exp $)
+# Version: 2.1.2 ($Id: blosxom.cgi,v 1.87 2008/11/13 16:39:59 alfie Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
 package blosxom;
+
+=head1 NAME
+
+blosxom - A lightweight yet feature-packed weblog
+
+=head1 SYNOPSIS
+
+B<blosxom> is a simple web log (blog) CGI script written in perl.
+
+=head1 DESCRIPTION
+
+B<Blosxom> (pronounced "I<blossom>") is a lightweight yet feature-packed
+weblog application designed from the ground up with simplicity,
+usability, and interoperability in mind.
+
+Fundamental is its reliance upon the file system, folders and files
+as its content database. Blosxom's weblog entries are plain text
+files like any other. Write from the comfort of your favorite text
+editor and hit the Save button. Create, edit, rename, and delete entries
+on the command-line, via FTP, WebDAV, or anything else you
+might use to manipulate your files. There's no import or export; entries
+are nothing more complex than title on the first line, body being
+everything thereafter.
+
+Despite its tiny footprint, Blosxom doesn't skimp on features, sporting
+the majority of features one would find in any other Weblog application.
+
+Blosxom is simple, straightforward, minimalist Perl affording even the
+dabbler an opportunity for experimentation and customization. And
+last, but not least, Blosxom is open source and free for the taking and
+altering.
+
+=head1 USAGE
+
+Write a weblog entry, and place it into the main data directory. Place
+the the title is on the first line; the body is everything afterwards.
+For example, create a file named I<first.txt> and put in it something
+like this:
+
+  First Blosxom Post!
+
+  I have successfully installed blosxom on this system.  For more
+  information on blosxom, see the author's <a
+  href="http://www.blosxom.com/">blosxom site</a>.
+
+Place the file in the directory under the I<$datadir> points to. Be
+sure to change the default location to be somewhere accessable by the
+web server that runs blosxom as a CGI program.
+
+=cut
 
 # --- Configurable variables -----
 
