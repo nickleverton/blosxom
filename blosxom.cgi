@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
-# Version: 2.1.2 ($Id: blosxom.cgi,v 1.87 2008/11/13 16:39:59 alfie Exp $)
+# Version: 2.1.2 ($Id: blosxom.cgi,v 1.88 2008/11/13 17:19:51 alfie Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -50,7 +50,7 @@ like this:
 
   I have successfully installed blosxom on this system.  For more
   information on blosxom, see the author's <a
-  href="http://www.blosxom.com/">blosxom site</a>.
+  href="http://blosxom.sourceforge.net/">blosxom site</a>.
 
 Place the file in the directory under the I<$datadir> points to. Be
 sure to change the default location to be somewhere accessable by the
@@ -130,6 +130,53 @@ $static_entries = 0;
 $encode_xml_entities = 1;
 
 # --------------------------------
+
+=head1 ENVIRONMENT
+
+=over
+
+=item B<BLOSXOM_CONFIG_FILE>
+
+Points to the location of the configuration file. This will be
+considered as first option, if it's set.
+
+
+=item B<BLOSXOM_CONFIG_DIR>
+
+The here named directory will be tried unless the above mentioned
+environment variable is set and tested for a contained blosxom.conf
+file.
+
+
+=back
+
+
+=head1 FILES
+
+=over
+
+=item B</usr/lib/cgi-bin/blosxom>
+
+The CGI script itself. Please note that the location might depend on
+your installation.
+
+=item B</etc/blosxom/blosxom.conf>
+
+The default configuration file location. This is rather taken as last
+ressort if no other configuration location is set through environment
+variables.
+
+=back
+
+
+=head1 AUTHOR
+
+Rael Dornfest <rael@oreilly.com> was the original author of blosxom. The
+development was picked up by a team of dedicated users of blosxom since
+2005. See <I<http://blosxom.sourceforge.net/>> for more information.
+
+=cut
+
 
 use vars
     qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info_full $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others $encode_xml_entities $content_type !;
