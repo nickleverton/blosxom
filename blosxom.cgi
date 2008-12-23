@@ -99,6 +99,14 @@ $default_flavour = "html";
 # Should I show entries from the future (i.e. dated after now)?
 $show_future_entries = 0;
 
+# Should date components of the path always be at the front?
+# If this is disabled, the date components can appear anywhere in the
+# url (but always directly after each other, in the year/month/day
+# order). For example, /category/subcategory/2008/12/ (or even
+# /category/2008/12/subcategory/) shows all posts in subcategory from
+# December 2008.
+$date_first_in_url = 0;
+
 # --- Plugins (Optional) -----
 
 # File listing plugins blosxom should load (if empty blosxom will load
@@ -235,6 +243,7 @@ use vars qw!
     $output
     $header
     $show_future_entries
+    $date_first_in_url
     %files
     %indexes
     %others
@@ -394,9 +403,11 @@ sub blosxom_html_escape {
 # Global variable to be used in head/foot.{flavour} templates
 $path_info = '';
 
-# Add all @path_info elements to $path_info till we come to one that could be a year
-while ( $path_info[0] && $path_info[0] !~ /^(19|20)\d{2}$/ ) {
-    $path_info .= '/' . shift @path_info;
+if (!$date_first_in_url) {
+    # Add all @path_info elements to $path_info till we come to one that could be a year
+    while ( $path_info[0] && $path_info[0] !~ /^(19|20)\d{2}$/ ) {
+        $path_info .= '/' . shift @path_info;
+    }
 }
 
 # Pull date elements out of path
