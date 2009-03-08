@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
-# Version: 2.1.2 ($Id: blosxom.cgi,v 1.88 2008/11/13 17:19:51 alfie Exp $)
+# Version: 2.1.2 ($Id: blosxom.cgi,v 1.89 2009/03/08 00:47:54 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -188,7 +188,7 @@ use File::stat;
 use Time::Local;
 use CGI qw/:standard :netscape/;
 
-$version = "2.1.2";
+$version = "2.1.2+dev";
 
 # Load configuration from $ENV{BLOSXOM_CONFIG_DIR}/blosxom.conf, if it exists
 my $blosxom_config;
