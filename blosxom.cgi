@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
-# Version: 2.1.2 ($Id: blosxom.cgi,v 1.92 2009/03/08 01:11:15 xtaran Exp $)
+# Version: 2.1.2 ($Id: blosxom.cgi,v 1.93 2009/03/08 01:14:35 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -671,7 +671,7 @@ sub generate {
         package blosxom;
         my $template = shift;
         # Interpolate scalars, namespaced scalars, and hash/hashref scalars
-        $template =~ s/(\$\w+(?:::\w+)*(?:(?:->)?{(['"]?)[-\w]+\2})?)/"defined $1 ? $1 : ''"/gee;
+        $template =~ s/(\$\w+(?:::\w+)*(?:(?:->)?{([\'\"]?)[-\w]+\2})?)/"defined $1 ? $1 : ''"/gee;
         return $template;
     };
 
