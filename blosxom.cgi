@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
-# Version: 2.1.2 ($Id: blosxom.cgi,v 1.91 2009/03/08 00:58:52 xtaran Exp $)
+# Version: 2.1.2 ($Id: blosxom.cgi,v 1.92 2009/03/08 01:11:15 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -137,6 +137,11 @@ $static_entries = 0;
 # this off if they do it themselves)
 $encode_xml_entities = 1;
 
+# Should I encode 8 bit special characters, e.g. umlauts in URLs, e.g.
+# convert an ISO-Latin-1 \"o to %F6? (off by default for now; plugins
+# can change this, too)
+$encode_8bit_chars = 0;
+
 # --------------------------------
 
 =head1 ENVIRONMENT
@@ -187,7 +192,7 @@ development was picked up by a team of dedicated users of blosxom since
 
 
 use vars
-    qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info_full $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others $encode_xml_entities $content_type !;
+    qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info_full $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others $encode_xml_entities $encode_8bit_chars $content_type !;
 
 use strict;
 use FileHandle;
@@ -820,6 +825,12 @@ sub generate {
                 $url   = blosxom_html_escape($url);
                 $path  = blosxom_html_escape($path);
                 $fn    = blosxom_html_escape($fn);
+            }
+
+            if ($encode_8bit_chars) {
+                $url   =~ s([^-a-zA-Z0-9_./:])(sprintf('%%%02X', ord($&)))ge;
+                $path  =~ s([^-a-zA-Z0-9_./:])(sprintf('%%%02X', ord($&)))ge;
+                $fn    =~ s([^-a-zA-Z0-9_./:])(sprintf('%%%02X', ord($&)))ge;
             }
 
             $story = &$interpolate($story);
