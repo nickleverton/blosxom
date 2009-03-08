@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
-# Version: 2.1.2 ($Id: blosxom.cgi,v 1.90 2009/03/08 00:50:55 xtaran Exp $)
+# Version: 2.1.2 ($Id: blosxom.cgi,v 1.91 2009/03/08 00:58:52 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -75,12 +75,16 @@ $blog_encoding = "UTF-8";
 # Where are this blog's entries kept?
 $datadir = "/Library/WebServer/Documents/blosxom";
 
-# What's my preferred base URL for this blog (leave blank for automatic)?
+# What's my preferred base URL for this blog (leave blank for
+# automatic)?
 $url = "";
 
 # Should I stick only to the datadir for items or travel down the
 # directory hierarchy looking for items?  If so, to what depth?
-# 0 = infinite depth (aka grab everything), 1 = datadir only, n = n levels down
+#
+# 0 = infinite depth (aka grab everything), 1 = datadir only,
+# n = n levels down
+
 $depth = 0;
 
 # How many entries should I show on the home page?
@@ -97,8 +101,8 @@ $show_future_entries = 0;
 
 # --- Plugins (Optional) -----
 
-# File listing plugins blosxom should load
-# (if empty blosxom will load all plugins in $plugin_dir and $plugin_path directories)
+# File listing plugins blosxom should load (if empty blosxom will load
+# all plugins in $plugin_dir and $plugin_path directories)
 $plugin_list = "";
 
 # Where are my plugins kept?
@@ -107,8 +111,8 @@ $plugin_dir = "";
 # Where should my plugins keep their state information?
 $plugin_state_dir = "$plugin_dir/state";
 
-# Additional plugins location
-# List of directories, separated by ';' on windows, ':' everywhere else
+# Additional plugins location. A list of directories, separated by ';'
+# on windows, ':' everywhere else.
 $plugin_path = "";
 
 # --- Static Rendering -----
@@ -116,7 +120,8 @@ $plugin_path = "";
 # Where are this blog's static files to be created?
 $static_dir = "/Library/WebServer/Documents/blog";
 
-# What's my administrative password (you must set this for static rendering)?
+# What's my administrative password (you must set this for static
+# rendering)?
 $static_password = "";
 
 # What flavours should I generate statically?
@@ -128,7 +133,8 @@ $static_entries = 0;
 
 # --- Advanced Encoding Options -----
 
-# Should I encode entities for xml content-types? (plugins can turn this off if they do it themselves)
+# Should I encode entities for xml content-types? (plugins can turn
+# this off if they do it themselves)
 $encode_xml_entities = 1;
 
 # --------------------------------
