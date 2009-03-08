@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
-# Version: 2.1.2 ($Id: blosxom.cgi,v 1.89 2009/03/08 00:47:54 xtaran Exp $)
+# Version: 2.1.2 ($Id: blosxom.cgi,v 1.90 2009/03/08 00:50:55 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -125,6 +125,8 @@ $static_password = "";
 # Should I statically generate individual entries?
 # 0 = no, 1 = yes
 $static_entries = 0;
+
+# --- Advanced Encoding Options -----
 
 # Should I encode entities for xml content-types? (plugins can turn this off if they do it themselves)
 $encode_xml_entities = 1;
