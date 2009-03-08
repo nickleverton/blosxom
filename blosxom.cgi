@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
-# Version: 2.1.2 ($Id: blosxom.cgi,v 1.93 2009/03/08 01:14:35 xtaran Exp $)
+# Version: 2.1.2 ($Id: blosxom.cgi,v 1.94 2009/03/08 01:18:11 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -191,8 +191,54 @@ development was picked up by a team of dedicated users of blosxom since
 =cut
 
 
-use vars
-    qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info_full $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others $encode_xml_entities $encode_8bit_chars $content_type !;
+use vars qw!
+    $version
+    $blog_title
+    $blog_description
+    $blog_language
+    $blog_encoding
+    $datadir
+    $url
+    %template
+    $template
+    $depth
+    $num_entries
+    $file_extension
+    $default_flavour
+    $static_or_dynamic
+    $config_dir
+    $plugin_list
+    $plugin_path
+    $plugin_dir
+    $plugin_state_dir
+    @plugins
+    %plugins
+    $static_dir
+    $static_password
+    @static_flavours
+    $static_entries
+    $path_info_full
+    $path_info
+    $path_info_yr
+    $path_info_mo
+    $path_info_da
+    $path_info_mo_num
+    $flavour
+    $static_or_dynamic
+    %month2num
+    @num2month
+    $interpolate
+    $entries
+    $output
+    $header
+    $show_future_entries
+    %files
+    %indexes
+    %others
+    $encode_xml_entities
+    $encode_8bit_chars
+    $content_type
+!;
 
 use strict;
 use FileHandle;
