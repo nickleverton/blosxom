@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2009)
-# Version: 2.1.2 ($Id: blosxom.cgi,v 1.97 2009/07/19 17:14:20 xtaran Exp $)
+# Version: 2.1.2 ($Id: blosxom.cgi,v 1.98 2009/07/19 17:18:37 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -871,9 +871,7 @@ sub generate {
                  $content_type !~ m{\bxhtml\b} ) {
                 # Escape special characters inside the <link> container
 
-                $url   =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
-                $path  =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
-                $fn    =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
+		&url_escape_url_path_and_fn();
 
                 # Escape <, >, and &, and to produce valid RSS
                 $title = blosxom_html_escape($title);
@@ -885,9 +883,7 @@ sub generate {
 
 	    # Fix special characters in links inside XML content
             if ($encode_8bit_chars) {
-                $url   =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))ge;
-                $path  =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))ge;
-                $fn    =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))ge;
+		&url_escape_url_path_and_fn();
             }
 
             $story = &$interpolate($story);
@@ -945,6 +941,12 @@ sub nice_date {
         . sprintf( "%02d", ( $offset % 3600 ) / 60 );
 
     return ( $dw, $mo, $mo_num, $da, $ti, $yr, $utc_offset );
+}
+
+sub url_escape_url_path_and_fn {
+    $url   =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
+    $path  =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
+    $fn    =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
 }
 
 # Default HTML and RSS template bits
