@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2009)
-# Version: 2.1.2 ($Id: blosxom.cgi,v 1.95 2009/03/08 01:28:06 xtaran Exp $)
+# Version: 2.1.2 ($Id: blosxom.cgi,v 1.96 2009/07/19 12:21:09 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -142,6 +142,11 @@ $encode_xml_entities = 1;
 # can change this, too)
 $encode_8bit_chars = 0;
 
+# RegExp matching all characters which should be URL encoded in links.
+# Defaults to anything but numbers, letters, slash, colon, dash,
+# underscore and dot.
+$url_escape_re = qr([^-/a-zA-Z0-9:._]);
+
 # --------------------------------
 
 =head1 ENVIRONMENT
@@ -237,6 +242,7 @@ use vars qw!
     %others
     $encode_xml_entities
     $encode_8bit_chars
+    $url_escape_re
     $content_type
 !;
 
@@ -856,10 +862,6 @@ sub generate {
                  $content_type =~ m{\bxml\b} &&
                  $content_type !~ m{\bxhtml\b} ) {
                 # Escape special characters inside the <link> container
-
-                # The following line should be moved more towards to top for
-                # performance reasons -- Axel Beckert, 2008-07-22
-                my $url_escape_re = qr([^-/a-zA-Z0-9:._]);
 
                 $url   =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
                 $path  =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
