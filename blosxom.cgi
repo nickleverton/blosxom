@@ -2,7 +2,7 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2009)
-# Version: 2.1.2 ($Id: blosxom.cgi,v 1.96 2009/07/19 12:21:09 xtaran Exp $)
+# Version: 2.1.2 ($Id: blosxom.cgi,v 1.97 2009/07/19 17:14:20 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -858,6 +858,14 @@ sub generate {
                 }
             }
 
+	    # Save unescaped versions and allow them to be used in
+	    # flavour templates.
+	    use vars qw/$url_unesc $path_unesc $fn_unesc/;
+	    $url_unesc  = $url;
+	    $path_unesc = $path;
+	    $fn_unesc   = $fn;
+
+	    # Fix special characters in links inside XML content
             if ( $encode_xml_entities &&
                  $content_type =~ m{\bxml\b} &&
                  $content_type !~ m{\bxhtml\b} ) {
@@ -875,10 +883,11 @@ sub generate {
                 $fn    = blosxom_html_escape($fn);
             }
 
+	    # Fix special characters in links inside XML content
             if ($encode_8bit_chars) {
-                $url   =~ s([^-a-zA-Z0-9_./:])(sprintf('%%%02X', ord($&)))ge;
-                $path  =~ s([^-a-zA-Z0-9_./:])(sprintf('%%%02X', ord($&)))ge;
-                $fn    =~ s([^-a-zA-Z0-9_./:])(sprintf('%%%02X', ord($&)))ge;
+                $url   =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))ge;
+                $path  =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))ge;
+                $fn    =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))ge;
             }
 
             $story = &$interpolate($story);
