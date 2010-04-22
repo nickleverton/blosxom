@@ -3,7 +3,7 @@ Section: web
 Priority: optional
 Maintainer: Gerfried Fuchs <rhonda@debian.at>
 Uploaders: Axel Beckert <abe@deuxchevaux.org>
-Standards-Version: 3.8.0
+Standards-Version: 3.8.4
 Homepage: http://blosxom.sourceforge.net/
 Vcs-Git: git://blosxom.git.sourceforge.net/gitroot/blosxom/blosxom
 Vcs-Browser: http://blosxom.git.sourceforge.net/git/gitweb.cgi?p=blosxom/blosxom;a=summary

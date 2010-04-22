@@ -1,6 +1,7 @@
 blosxom (2.1.2-2) unstable; urgency=low
 
   * Update Vcs-* entries to project's own git repository.
+  * Bumped to Standards-Version to 3.8.4.
 
  -- 
 
