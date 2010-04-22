@@ -1,3 +1,9 @@
+blosxom (2.1.2-2) unstable; urgency=low
+
+  * Update Vcs-* entries to project's own git repository.
+
+ -- 
+
 blosxom (2.1.2-1) unstable; urgency=high
 
   * New upstream release: Fixes Cross-Site Scripting (XSS) vulnerability with

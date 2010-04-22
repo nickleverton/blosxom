@@ -5,8 +5,8 @@ Maintainer: Gerfried Fuchs <rhonda@debian.at>
 Uploaders: Axel Beckert <abe@deuxchevaux.org>
 Standards-Version: 3.8.0
 Homepage: http://blosxom.sourceforge.net/
-Vcs-Git: git://repo.or.cz/blosxom.git
-Vcs-Browser: http://repo.or.cz/w/blosxom.git
+Vcs-Git: git://blosxom.git.sourceforge.net/gitroot/blosxom/blosxom
+Vcs-Browser: http://blosxom.git.sourceforge.net/git/gitweb.cgi?p=blosxom/blosxom;a=summary
 
 Package: blosxom
 Architecture: all
