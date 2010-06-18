@@ -550,6 +550,7 @@ sub load_template {
 # Define default entries subroutine
 $entries = sub {
     my ( %files, %indexes, %others );
+    my $param_all = param('-all');
     find(
         sub {
             my $d;
@@ -579,7 +580,7 @@ $entries = sub {
                 # static rendering bits
                 my $static_file
                     = "$static_dir/$1/index." . $static_flavours[0];
-                if (   param('-all')
+                if (   $param_all
                     or !-f $static_file
                     or stat($static_file)->mtime < $mtime )
                 {
