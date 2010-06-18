@@ -1,7 +1,6 @@
 Running Tests
 =============
 
-  perl ./Setup
   prove *.t
 
 
@@ -11,10 +10,8 @@ Test Layout
 
 To add a new test, you want to add two things - a test script (which
 is typically just a symlink to the main 'driver' script), and a test
-directory. If you just want a symlink test script, then add your
-test script name to 'Tests', and rerun Setup. To add a new test 
-directory, you're probably best just to copy one of the existing 
-ones - 'templates' is a good choice:
+directory. To add a new test directory, you're probably best just to 
+copy one of the existing ones - 'templates' is a good choice:
 
   cp -rp templates newtest
 
