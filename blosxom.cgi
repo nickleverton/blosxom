@@ -555,6 +555,7 @@ $entries = sub {
         sub {
             my $curr_depth = $File::Find::dir =~ tr[/][];
             return if $depth and $curr_depth > $depth;
+            return if !-r $File::Find::name;
 
             if (
 
@@ -563,7 +564,7 @@ $entries = sub {
                 =~ m!^$datadir/(?:(.*)/)?(.+)\.$file_extension$!
 
                 # not an index, .file, and is readable
-                and $2 ne 'index' and $2 !~ /^\./ and ( -r $File::Find::name )
+                and $2 ne 'index' and $2 !~ /^\./
                 )
             {
 
@@ -592,7 +593,7 @@ $entries = sub {
             }
 
             # not an entries match
-            elsif ( !-d $File::Find::name and -r $File::Find::name ) {
+            elsif ( !-d $File::Find::name ) {
                 $others{$File::Find::name} = stat($File::Find::name)->mtime;
             }
         },
