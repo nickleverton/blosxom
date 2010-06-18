@@ -10,3 +10,6 @@ dist:
 test:
 	prove t/*.t
 
+tidycheck:
+	perltidy blosxom.cgi | diff -u blosxom.cgi -
+
