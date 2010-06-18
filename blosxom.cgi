@@ -557,16 +557,11 @@ $entries = sub {
             return if $depth and $curr_depth > $depth;
             return if !-r $File::Find::name;
 
-            if (
-
-                # a match
-                $File::Find::name
-                =~ m!^$datadir/(?:(.*)/)?(.+)\.$file_extension$!
-
-                # not an index, .file, and is readable
-                and $2 ne 'index' and $2 !~ /^\./
-                )
+            # if a $file_extension file and not a .file or an index
+            if ( m/^([^.].*)\.$file_extension$/
+                and $1 ne 'index' )
             {
+                my $basename_noext = $1;
 
                 # read modification time
                 my $mtime = stat($File::Find::name)->mtime or return;
@@ -578,16 +573,17 @@ $entries = sub {
                 $files{$File::Find::name} = $mtime;
 
                 # static rendering bits
+                (my $dirname = $File::Find::dir) =~ s!^$datadir/?!!;
                 my $static_file
-                    = "$static_dir/$1/index." . $static_flavours[0];
+                    = "$static_dir/${dirname}index.$static_flavours[0]";
                 if (   $param_all
                     or !-f $static_file
                     or stat($static_file)->mtime < $mtime )
                 {
-                    $indexes{$1} = 1;
+                    $indexes{$dirname} = 1;
                     my $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
                     $indexes{$d} = $d;
-                    $indexes{ ( $1 ? "$1/" : '' ) . "$2.$file_extension" } = 1
+                    $indexes{"$dirname$basename_noext.$file_extension"} = 1
                         if $static_entries;
                 }
             }
