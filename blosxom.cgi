@@ -619,11 +619,7 @@ my ( $files, $indexes, $others ) = &$entries();
 %indexes = %$indexes;
 
 # Static
-if (    !$ENV{GATEWAY_INTERFACE}
-    and param('-password')
-    and $static_password
-    and param('-password') eq $static_password )
-{
+if ( $static_or_dynamic eq 'static' ) {
 
     param('-quiet') or print "Blosxom is generating static index pages...\n";
 
