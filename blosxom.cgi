@@ -553,7 +553,6 @@ $entries = sub {
     my $param_all = param('-all');
     find(
         sub {
-            my $d;
             my $curr_depth = $File::Find::dir =~ tr[/][];
             return if $depth and $curr_depth > $depth;
 
@@ -585,7 +584,7 @@ $entries = sub {
                     or stat($static_file)->mtime < $mtime )
                 {
                     $indexes{$1} = 1;
-                    $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
+                    my $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
                     $indexes{$d} = $d;
                     $indexes{ ( $1 ? "$1/" : '' ) . "$2.$file_extension" } = 1
                         if $static_entries;
