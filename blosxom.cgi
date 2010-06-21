@@ -584,18 +584,21 @@ $entries = sub {
                 $files{$File::Find::name} = $mtime;
 
                 # static rendering bits
-                (my $dirname = $File::Find::dir) =~ s!^$datadir/?!!;
-                my $static_file
-                    = "$static_dir/${dirname}index.$static_flavours[0]";
-                if (   $param_all
-                    or !-f $static_file
-                    or stat($static_file)->mtime < $mtime )
-                {
-                    $indexes{$dirname} = 1;
-                    my $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
-                    $indexes{$d} = $d;
-                    $indexes{"$dirname$basename_noext.$file_extension"} = 1
-                        if $static_entries;
+                if ( $static_or_dynamic eq 'static' ) {
+                    ( my $dirname = $File::Find::dir ) =~ s!^$datadir/?!!;
+                    my $static_file
+                        = "$static_dir/${dirname}index.$static_flavours[0]";
+                    if (   $param_all
+                        or !-f $static_file
+                        or stat($static_file)->mtime < $mtime )
+                    {
+                        $indexes{$dirname} = 1;
+                        my $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
+                        $indexes{$d} = $d;
+                        $indexes{"$dirname$basename_noext.$file_extension"}
+                            = 1
+                            if $static_entries;
+                    }
                 }
             }
 
