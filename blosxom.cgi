@@ -721,10 +721,7 @@ sub generate {
     my $skip;
     foreach my $plugin (@plugins) {
         if ( $plugins{$plugin} > 0 and $plugin->can('skip') ) {
-            if ( my $tmp = $plugin->skip() ) {
-                $skip = $tmp;
-                last;
-            }
+            last if $skip = $plugin->skip();
         }
     }
 
