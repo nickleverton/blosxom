@@ -728,6 +728,8 @@ sub generate {
         }
     }
 
+    unless ($skip) {
+
     # Define default interpolation subroutine
     $interpolate = sub {
 
@@ -739,8 +741,6 @@ sub generate {
             =~ s/(\$\w+(?:::\w+)*(?:(?:->)?{([\'\"]?)[-\w]+\2})?)/"defined $1 ? $1 : ''"/gee;
         return $template;
     };
-
-    unless ( $skip ) {
 
         # Plugins: Interpolate
         # Allow for the first encountered plugin::interpolate subroutine to
