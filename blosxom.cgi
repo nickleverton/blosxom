@@ -740,7 +740,7 @@ sub generate {
         return $template;
     };
 
-    unless ( defined($skip) and $skip ) {
+    unless ( $skip ) {
 
         # Plugins: Interpolate
         # Allow for the first encountered plugin::interpolate subroutine to
