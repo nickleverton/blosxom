@@ -860,8 +860,7 @@ sub generate {
             # Plugins: Story
             foreach my $plugin (@plugins) {
                 if ( $plugins{$plugin} > 0 and $plugin->can('story') ) {
-                    $plugin->story( $path, $fn, \$story, \$title,
-                        \$body );
+                    $plugin->story( $path, $fn, \$story, \$title, \$body );
                 }
             }
 
