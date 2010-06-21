@@ -701,7 +701,7 @@ foreach my $plugin (@plugins) {
 
 # Generate
 sub generate {
-    my ( $static_or_dynamic, $currentdir, $date, $flavour, $content_type )
+    my ( $static_or_dynamic, $currentdir, $date_str, $flavour, $content_type )
         = @_;
 
     %files = %$files;
@@ -798,7 +798,7 @@ sub generate {
         }
 
         foreach my $path_file ( &$sort( \%f, \%others ) ) {
-            last if $ne <= 0 && $date !~ /\d/;
+            last if $ne <= 0 && $date_str !~ /\d/;
             use vars qw/ $path $fn /;
             ( $path, $fn )
                 = $path_file =~ m!^$datadir/(?:(.*)/)?(.*)\.$file_extension!;
@@ -823,7 +823,7 @@ sub generate {
 
             # Only stories from the right date
             my ( $path_info_yr, $path_info_mo_num, $path_info_da )
-                = split /\//, $date;
+                = split /\//, $date_str;
             next if $path_info_yr     && $yr != $path_info_yr;
             last if $path_info_yr     && $yr < $path_info_yr;
             next if $path_info_mo_num && $mo ne $num2month[$path_info_mo_num];
