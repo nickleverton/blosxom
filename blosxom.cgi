@@ -695,7 +695,7 @@ else {
 # Plugins: End
 foreach my $plugin (@plugins) {
     if ( $plugins{$plugin} > 0 and $plugin->can('end') ) {
-        $entries = $plugin->end();
+        $plugin->end();
     }
 }
 
@@ -710,7 +710,7 @@ sub generate {
     # Plugins: Filter
     foreach my $plugin (@plugins) {
         if ( $plugins{$plugin} > 0 and $plugin->can('filter') ) {
-            $entries = $plugin->filter( \%files, \%others );
+            $plugin->filter( \%files, \%others );
         }
     }
 
@@ -760,7 +760,7 @@ sub generate {
         # Plugins: Head
         foreach my $plugin (@plugins) {
             if ( $plugins{$plugin} > 0 and $plugin->can('head') ) {
-                $entries = $plugin->head( $currentdir, \$head );
+                $plugin->head( $currentdir, \$head );
             }
         }
 
@@ -839,10 +839,8 @@ sub generate {
             # Plugins: Date
             foreach my $plugin (@plugins) {
                 if ( $plugins{$plugin} > 0 and $plugin->can('date') ) {
-                    $entries
-                        = $plugin->date( $currentdir, \$date,
-                        $files{$path_file}, $dw, $mo, $mo_num, $da, $ti,
-                        $yr );
+                    $plugin->date( $currentdir, \$date, $files{$path_file},
+                        $dw, $mo, $mo_num, $da, $ti, $yr );
                 }
             }
 
@@ -865,7 +863,7 @@ sub generate {
             # Plugins: Story
             foreach my $plugin (@plugins) {
                 if ( $plugins{$plugin} > 0 and $plugin->can('story') ) {
-                    $entries = $plugin->story( $path, $fn, \$story, \$title,
+                    $plugin->story( $path, $fn, \$story, \$title,
                         \$body );
                 }
             }
@@ -914,7 +912,7 @@ sub generate {
         # Plugins: Foot
         foreach my $plugin (@plugins) {
             if ( $plugins{$plugin} > 0 and $plugin->can('foot') ) {
-                $entries = $plugin->foot( $currentdir, \$foot );
+                $plugin->foot( $currentdir, \$foot );
             }
         }
 
@@ -924,7 +922,7 @@ sub generate {
         # Plugins: Last
         foreach my $plugin (@plugins) {
             if ( $plugins{$plugin} > 0 and $plugin->can('last') ) {
-                $entries = $plugin->last();
+                $plugin->last();
             }
         }
 
