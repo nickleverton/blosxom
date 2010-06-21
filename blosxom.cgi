@@ -775,7 +775,7 @@ sub generate {
                 if $files{"$datadir/$currentdir"};
         }
         else {
-            $currentdir =~ s!/index\..+$!!;
+            $currentdir =~ s! /index\..+$ !!x;
         }
 
         # Define a default sort subroutine
