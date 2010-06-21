@@ -730,17 +730,17 @@ sub generate {
 
     unless ($skip) {
 
-    # Define default interpolation subroutine
-    $interpolate = sub {
+        # Define default interpolation subroutine
+        $interpolate = sub {
 
-        package blosxom;
-        my $template = shift;
+            package blosxom;
+            my $template = shift;
 
-        # Interpolate scalars, namespaced scalars, and hash/hashref scalars
-        $template
-            =~ s/(\$\w+(?:::\w+)*(?:(?:->)?{([\'\"]?)[-\w]+\2})?)/"defined $1 ? $1 : ''"/gee;
-        return $template;
-    };
+            # Interpolate scalars, namespaced scalars, and hash/hashref scalars
+            $template
+                =~ s/(\$\w+(?:::\w+)*(?:(?:->)?{([\'\"]?)[-\w]+\2})?)/"defined $1 ? $1 : ''"/gee;
+            return $template;
+        };
 
         # Plugins: Interpolate
         # Allow for the first encountered plugin::interpolate subroutine to
