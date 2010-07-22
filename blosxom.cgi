@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # Blosxom
-# Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2009)
+# Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2010)
 # Version: 2.1.2 ($Id: blosxom.cgi,v 1.98 2009/07/19 17:18:37 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
