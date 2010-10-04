@@ -107,6 +107,9 @@ $show_future_entries = 0;
 # December 2008.
 $date_first_in_url = 0;
 
+# Display date template when date changes, not date template
+$date_break_on_date_string = 0;
+
 # --- Plugins (Optional) -----
 
 # File listing plugins blosxom should load (if empty blosxom will load
@@ -251,6 +254,7 @@ use vars qw!
     $encode_8bit_chars
     $url_escape_re
     $content_type
+    $date_break_on_date_string
     !;
 
 use strict;
@@ -842,9 +846,21 @@ sub generate {
 
             $date = &$interpolate($date);
 
-            if ( $date && $curdate ne $date ) {
-                $curdate = $date;
-                $output .= $date;
+            # Traditionally blosxom displays the date whenever the date 
+            # template output changes. If you want to have conditionals
+            # in your date template so the output can change without the
+            # date changing, set $date_break_on_date_string to true.
+            if ( ! $date_break_on_date_string ) {
+                if ( $date && $curdate ne $date ) {
+                    $curdate = $date;
+                    $output .= $date;
+                }
+            }
+            else {
+                if ( $date && $curdate ne "$yr/$mo_num/$da" ) {
+                    $curdate = "$yr/$mo_num/$da";
+                    $output .= $date;
+                }
             }
 
             use vars qw/ $title $body $raw /;
