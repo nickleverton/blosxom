@@ -765,10 +765,6 @@ sub generate {
 
         $output .= $head;
 
-        # Stories
-        my $curdate = '';
-        my $ne      = $num_entries;
-
         if ( $currentdir =~ /(.*?)([^\/]+)\.(.+)$/ and $2 ne 'index' ) {
             $currentdir = "$1$2.$file_extension";
             %f = ( "$datadir/$currentdir" => $files{"$datadir/$currentdir"} )
@@ -785,9 +781,9 @@ sub generate {
                 keys %$files_ref;
         };
 
-     # Plugins: Sort
-     # Allow for the first encountered plugin::sort subroutine to override the
-     # default built-in sort subroutine
+        # Plugins: Sort
+        # Allow for the first encountered plugin::sort subroutine to override the
+        # default built-in sort subroutine
         foreach my $plugin (@plugins) {
             if ( $plugins{$plugin} > 0 and $plugin->can('sort') ) {
                 if ( my $tmp = $plugin->sort() ) {
@@ -797,6 +793,9 @@ sub generate {
             }
         }
 
+        # Stories
+        my $curdate = '';
+        my $ne      = $num_entries;
         foreach my $path_file ( &$sort( \%f, \%others ) ) {
             last if $ne <= 0 && $date_str !~ /\d/;
             use vars qw/ $path $fn /;
