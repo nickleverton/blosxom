@@ -107,7 +107,9 @@ $show_future_entries = 0;
 # December 2008.
 $date_first_in_url = 0;
 
-# Display date template when date changes, not date template
+# Should I display the date template only when the actual date changes,
+# not the date template? (Only needed if you're using conditionals
+# within your date templates)
 $date_break_on_date_string = 0;
 
 # --- Plugins (Optional) -----
@@ -846,7 +848,7 @@ sub generate {
 
             $date = &$interpolate($date);
 
-            # Traditionally blosxom displays the date whenever the date 
+            # Traditionally blosxom displays the date whenever the date
             # template output changes. If you want to have conditionals
             # in your date template so the output can change without the
             # date changing, set $date_break_on_date_string to true.
