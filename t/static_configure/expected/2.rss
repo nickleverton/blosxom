@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>My Weblog</title>
+    <link>http://localhost/2.rss</link>
+    <description>Yet another Blosxom weblog.</description>
+    <language>en</language>
+    <docs>http://blogs.law.harvard.edu/tech/rss</docs>
+    <generator>blosxom/2.1.2+dev</generator>
+
+  <item>
+    <title>Lorem ipsum II</title>
+    <pubDate>Sat, 30 Sep 2006 12:35:00 +0000</pubDate>
+    <link>http://localhost/2006/09/30#2</link>
+    <category></category>
+    <guid isPermaLink="false">http://localhost/2</guid>
+    <description>
+Lorem ipsum dolor sit amet ipso facto.Lorem ipsum dolor sit amet ipso
+facto.Lorem ipsum dolor sit amet ipso facto. Lorem ipsum dolor sit
+amet ipso facto.Lorem ipsum dolor sit amet ipso facto. 
+
+Lorem ipso hoccer foer tyr wuz de ras cora dola tymon ipso hoc cer fuz
+de ramas cora dola tymon ipso hoccer. Lorem ipso foer tyr wuz de ramas
+cora dola tym ipso hor.Lorem ipso foer tyr wuz de ramas cora dola tym
+ipso hor tyr wuz de ramas cora dola tymon ipso foer tyr wuz de ramas
+cora dola tymo. </description>
+  </item>
+  </channel>
+</rss>
