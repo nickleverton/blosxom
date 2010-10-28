@@ -140,6 +140,10 @@ $static_password = "";
 # What flavours should I generate statically?
 @static_flavours = qw/html rss/;
 
+# Should I generate static date pages?
+# 0 = no, 1 = yes
+$static_date_pages = 1;
+
 # Should I statically generate individual entries?
 # 0 = no, 1 = yes
 $static_entries = 0;
@@ -233,6 +237,7 @@ use vars qw!
     $static_dir
     $static_password
     @static_flavours
+    $static_date_pages
     $static_entries
     $path_info_full
     $path_info
@@ -599,8 +604,10 @@ $entries = sub {
                         or stat($static_file)->mtime < $mtime )
                     {
                         $indexes{$dirname} = 1;
-                        my $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
-                        $indexes{$d} = $d;
+                        if ( $static_date_pages ) {
+                            my $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
+                            $indexes{$d} = $d;
+                        }
                         $indexes{"$dirname$basename_noext.$file_extension"}
                             = 1
                             if $static_entries;
