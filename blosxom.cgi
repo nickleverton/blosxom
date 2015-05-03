@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
 # Blosxom
-# Author: Rael Dornfest <rael@oreilly.com>
-# Version: 2.0.2+njl
+# Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
+# Version: 2.1.1+njl ($Id: blosxom.cgi,v 1.83 2008/07/30 22:27:02 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -14,7 +14,7 @@ package blosxom;
 # --- Configurable variables -----
 
 use vars
-    qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $put_template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info_full $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others $encode_xml_entities !;
+    qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $put_template $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info_full $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others $encode_xml_entities $content_type !;
 
 # What's this blog's title?
 $blog_title = "My Weblog";
@@ -82,6 +82,9 @@ $static_password = "";
 # 0 = no, 1 = yes
 $static_entries = 0;
 
+# Should I encode entities for xml content-types? (plugins can turn this off if they do it themselves)
+$encode_xml_entities = 1;
+
 # --- Template variables -----
 
 # --- Callback variables -----
@@ -94,12 +97,9 @@ use FileHandle;
 use File::Find;
 use File::stat;
 use Time::Local;
-use CGI qw/ -compile :standard :netscape/;
+use CGI qw/:standard :netscape/;
 
-$version = "2.0.2+njl";
-
-# Should I encode entities for xml content-types? (plugins can turn this off if they do it themselves)
-$encode_xml_entities = 1;
+$version = "2.1.1+njl";
 
 # Load configuration from $ENV{BLOSXOM_CONFIG_DIR}/blosxom.conf, if it exists
 my $blosxom_config;
@@ -150,18 +150,39 @@ my $fh = new FileHandle;
 );
 @num2month = sort { $month2num{$a} <=> $month2num{$b} } keys %month2num;
 
-# Use the stated preferred URL or figure it out automatically
-$url ||= url( -path_info => 1 );
-$url =~ s/^included:/http:/ if $ENV{SERVER_PROTOCOL} eq 'INCLUDED';
+# Use the stated preferred URL or figure it out automatically. Set
+# $url manually in the config section above if CGI.pm doesn't guess
+# the base URL correctly, e.g. when called from a Server Side Includes
+# document or so.
+unless ($url) {
+    $url = url();
 
-# NOTE: Since v3.12, it looks as if CGI.pm misbehaves for SSIs and
-# always appends path_info to the url. To fix this, we always
-# request an url with path_info, and always remove it from the end of the
-# string.
-my $pi_len = length $ENV{PATH_INFO};
-my $might_be_pi = substr( $url, -$pi_len );
-substr( $url, -length $ENV{PATH_INFO} ) = ''
-    if $might_be_pi eq $ENV{PATH_INFO};
+    # Unescape %XX hex codes (from URI::Escape::uri_unescape)
+    $url =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;      
+
+    # Support being called from inside a SSI document
+    $url =~ s/^included:/http:/ if $ENV{SERVER_PROTOCOL} eq 'INCLUDED';
+
+    # Remove PATH_INFO if it is set but not removed by CGI.pm. This
+    # seems to happen when used with Apache's Alias directive or if
+    # called from inside a Server Side Include document. If that
+    # doesn't help either, set $url manually in the configuration.
+    $url =~ s/\Q$ENV{PATH_INFO}\E$// if defined $ENV{PATH_INFO};
+
+    # NOTE:
+    #
+    # There is one case where this code does more than necessary, too:
+    # If the URL requested is e.g. http://example.org/blog/blog and
+    # the base URL is correctly determined as http://example.org/blog
+    # by CGI.pm, then this code will incorrectly normalize the base
+    # URL down to http://example.org, because the same string as
+    # PATH_INFO is part of the base URL, too. But this is such a
+    # seldom case and can be fixed by setting $url in the config file,
+    # too.
+}
+
+# The only modification done to a manually set base URL is to strip
+# a trailing slash if present.
 
 $url =~ s!/$!!;
 
@@ -172,9 +193,6 @@ $static_dir =~ s!/$!!;
 
 # Fix depth to take into account datadir's path
 $depth += ( $datadir =~ tr[/][] ) - 1 if $depth;
-
-# Global variable to be used in head/foot.{flavour} templates
-$path_info = '';
 
 if (    !$ENV{GATEWAY_INTERFACE}
     and param('-password')
@@ -194,37 +212,45 @@ my @path_info = split m{/}, path_info() || param('path');
 $path_info_full = join '/', @path_info;      # Equivalent to $ENV{PATH_INFO}
 shift @path_info;
 
-# Category/directory names denoted by leading alpha and no dot (no flavour).
-while ( @path_info
-    and $path_info[0] =~ /^[a-zA-Z]/
-    and $path_info[0] !~ /\./ )
-{
+# Flavour specified by ?flav={flav} or index.{flav}
+$flavour = '';
+if (! ($flavour = param('flav'))) {
+    if ( $path_info[$#path_info] =~ /(.+)\.(.+)$/ ) {
+       $flavour = $2;
+        pop @path_info if $1 eq 'index';
+    }
+}
+$flavour ||= $default_flavour;
+
+# Global variable to be used in head/foot.{flavour} templates
+$path_info = '';
+# Add all @path_info elements to $path_info till we come to one that could be a year
+while ( $path_info[0] && $path_info[0] !~ /^(19|20)\d{2}$/) {
     $path_info .= '/' . shift @path_info;
 }
 
-# Flavour specified by ?flav={flav} or index.{flav}
-$flavour = '';
-
-if ( @path_info && $path_info[$#path_info] =~ /(.+)\.([^.]+)$/ ) {
-    $flavour = $2;
-    $path_info .= "/$1.$2" if $1 ne 'index';
-    pop @path_info;
+# Pull date elements out of path
+if ($path_info[0] && $path_info[0] =~ /^(19|20)\d{2}$/) {
+  $path_info_yr = shift @path_info;
+  if ($path_info[0] && 
+     ($path_info[0] =~ /^(0\d|1[012])$/ || 
+      exists $month2num{ ucfirst lc $path_info_mo })) {
+    $path_info_mo = shift @path_info;
+    # Map path_info_mo to numeric $path_info_mo_num
+    $path_info_mo_num = $path_info_mo =~ /^\d{2}$/
+      ? $path_info_mo
+      : $month2num{ ucfirst lc $path_info_mo };
+    if ($path_info[0] && $path_info[0] =~ /^[0123]\d$/) {
+      $path_info_da = shift @path_info;
+    }
+  }
 }
-else {
-    $flavour = param('flav') || $default_flavour;
-}
 
-# Strip leading and trailing slashes from remainder
-$path_info =~ s:^/+|/+$::g;
+# Add remaining path elements to $path_info
+$path_info .= '/' . join('/', @path_info);
 
-# Date fiddling
-( $path_info_yr, $path_info_mo, $path_info_da ) = @path_info;
-$path_info_mo_num =
-    $path_info_mo
-	? ( $path_info_mo =~ /\d{2}/
-	    ? $path_info_mo
-	    : ( $month2num{ ucfirst( lc $path_info_mo ) } || undef ) )
-	: undef;
+# Strip spurious slashes
+$path_info =~ s!(^/*)|(/*$)!!g;
 
 # Define standard template subroutine, plugin-overridable at Plugins: Template
 $template = sub {
@@ -259,6 +285,7 @@ $template = sub {
     }
 };
 
+# put_template still used by some plugins that haven't yet been updated to blosxom 2.1.x
 $put_template = sub {
     my ( $chunk, $flavour, $template ) = @_;
 
@@ -458,7 +485,7 @@ if (    !$ENV{GATEWAY_INTERFACE}
             mkdir "$static_dir/$p", 0755
                 unless ( -d "$static_dir/$p" or $p =~ /\.$file_extension$/ );
             foreach $flavour (@static_flavours) {
-                my $content_type
+                $content_type
                     = ( &$template( $p, 'content_type', $flavour ) );
                 $content_type =~ s!\n.*!!s;
                 my $fn = $p =~ m!^(.+)\.$file_extension$! ? $1 : "$p/index";
@@ -495,7 +522,7 @@ if (    !$ENV{GATEWAY_INTERFACE}
 
 # Dynamic
 else {
-    my $content_type = ( &$template( $path_info, 'content_type', $flavour ) );
+    $content_type = ( &$template( $path_info, 'content_type', $flavour ) );
     $content_type =~ s!\n.*!!s;
 
     $content_type =~ s/(\$\w+(?:::\w+)*)/"defined $1 ? $1 : ''"/gee;
@@ -504,7 +531,7 @@ else {
     print generate( 'dynamic', $path_info,
         (defined($path_info_yr) ? $path_info_yr : "") ."/".
 	    (defined($path_info_mo_num) ? $path_info_mo_num : "") ."/".
-	    (defined($path_info_da) ? $path_info_yr : ""),
+	    (defined($path_info_da) ? $path_info_da : ""),
         $flavour, $content_type );
 }
 
@@ -684,18 +711,33 @@ sub generate {
                 }
             }
 
-            if ( $encode_xml_entities && $content_type =~ m{\bxml\b} ) {
+            if ( $encode_xml_entities &&
+                 $content_type =~ m{\bxml\b} &&
+                 $content_type !~ m{\bxhtml\b} ) {
+                # Escape special characters inside the <link> container
+
+                # The following line should be moved more towards to top for
+                # performance reasons -- Axel Beckert, 2008-07-22
+                my $url_escape_re = qr([^-/a-zA-Z0-9:._]);
+
+                $url   =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
+                $path  =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
+                $fn    =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
 
                 # Escape <, >, and &, and to produce valid RSS
                 my %escape = (
                     '<' => '&lt;',
                     '>' => '&gt;',
                     '&' => '&amp;',
-                    '"' => '&quot;'
+                    '"' => '&quot;',
+                    "'" => '&apos;'
                 );
                 my $escape_re = join '|' => keys %escape;
                 $title =~ s/($escape_re)/$escape{$1}/g;
                 $body  =~ s/($escape_re)/$escape{$1}/g;
+                $url   =~ s/($escape_re)/$escape{$1}/g;
+                $path  =~ s/($escape_re)/$escape{$1}/g;
+                $fn    =~ s/($escape_re)/$escape{$1}/g;
             }
 
             $story = &$interpolate($story);
@@ -761,34 +803,31 @@ sub nice_date {
 __DATA__
 html content_type text/html; charset=$blog_encoding
 
+html head <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 html head <html>
 html head     <head>
-html head         <meta http-equiv="content-type" content="text/html;charset=$blog_encoding" />
+html head         <meta http-equiv="content-type" content="$content_type;charset=$blog_encoding" />
 html head         <link rel="alternate" type="application/rss+xml" title="RSS" href="$url/index.rss" />
-html head         <title>$blog_title $path_info_da $path_info_mo $path_info_yr
-html head         </title>
+html head         <title>$blog_title $path_info_da $path_info_mo $path_info_yr</title>
 html head     </head>
 html head     <body>
-html head         <center>
-html head             <font size="+3">$blog_title</font><br />
-html head             $path_info_da $path_info_mo $path_info_yr
-html head         </center>
-html head         <p />
+html head         <div align="center">
+html head             <h1>$blog_title</h1>
+html head             <p>$path_info_da $path_info_mo $path_info_yr</p>
+html head         </div>
 
-html story        <p>
-html story            <a name="$fn"><b>$title</b></a><br />
-html story            $body<br />
-html story            <br />
-html story            posted at: $ti | path: <a href="$url$path">$path </a> | <a href="$url/$yr/$mo_num/$da#$fn">permanent link to this entry</a>
-html story        </p>
+html story         <div>
+html story             <h3><a name="$fn">$title</a></h3>
+html story             <div>$body</div>
+html story             <p>posted at: $ti | path: <a href="$url$path">$path</a> | <a href="$url/$yr/$mo_num/$da#$fn">permanent link to this entry</a></p>
+html story         </div>
 
-html date         <h3>$dw, $da $mo $yr</h3>
+html date         <h2>$dw, $da $mo $yr</h2>
 
 html foot
-html foot         <p />
-html foot         <center>
-html foot             <a href="http://blosxom.sourceforge.net/"><img src="http://blosxom.sourceforge.net/images/pb_blosxom.gif" border="0" /></a>
-html foot         </center>
+html foot         <div align="center">
+html foot             <a href="http://blosxom.sourceforge.net/"><img src="http://blosxom.sourceforge.net/images/pb_blosxom.gif" alt="powered by blosxom" border="0" width="90" height="33" ></a>
+html foot         </div>
 html foot     </body>
 html foot </html>
 
@@ -809,7 +848,7 @@ rss story     <title>$title</title>
 rss story     <pubDate>$dw, $da $mo $yr $ti:00 $utc_offset</pubDate>
 rss story     <link>$url/$yr/$mo_num/$da#$fn</link>
 rss story     <category>$path</category>
-rss story     <guid isPermaLink="false">$path/$fn</guid>
+rss story     <guid isPermaLink="false">$url$path/$fn</guid>
 rss story     <description>$body</description>
 rss story   </item>
 
@@ -820,15 +859,17 @@ rss foot </rss>
 
 error content_type text/html
 
+error head <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 error head <html>
-error head <body>
-error head     <p><font color="red">Error: I'm afraid this is the first I've heard of a "$flavour" flavoured Blosxom.  Try dropping the "/+$flavour" bit from the end of the URL.</font></p>
+error head <head><title>Error: unknown Blosxom flavour "$flavour"</title></head>
+error head     <body>
+error head         <h1><font color="red">Error: unknown Blosxom flavour "$flavour"</font></h1>
+error head         <p>I'm afraid this is the first I've heard of a "$flavour" flavoured Blosxom.  Try dropping the "/+$flavour" bit from the end of the URL.</p>
 
+error story        <h3>$title</h3>
+error story        <div>$body</div> <p><a href="$url/$yr/$mo_num/$da#fn.$default_flavour">#</a></p>
 
-error story <p><b>$title</b><br />
-error story $body <a href="$url/$yr/$mo_num/$da#fn.$default_flavour">#</a></p>
-
-error date <h3>$dw, $da $mo $yr</h3>
+error date         <h2>$dw, $da $mo $yr</h2>
 
 error foot     </body>
 error foot </html>
