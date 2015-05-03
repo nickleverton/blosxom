@@ -2,7 +2,9 @@
 
 # Blosxom
 # Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
-# Version: 2.1.2+njl ($Id: blosxom.cgi,v 1.85 2008/10/02 01:09:41 xtaran Exp $)
+# Local mods by Nick Leverton <nick@leverton.org> 2007-2015
+# Local git https://github.com/nickleverton/blosxom/tree/local
+# Version: 2.1.2+njl.2 ($Id: blosxom.cgi,v 1.85 2008/10/02 01:09:41 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -102,7 +104,7 @@ use Time::Local;
 use URI::Escape;
 use CGI qw/:standard :netscape/;
 
-$version = "2.1.2+njl.1";
+$version = "2.1.2+njl.2";
 
 # Load configuration from $ENV{BLOSXOM_CONFIG_DIR}/blosxom.conf, if it exists
 my $blosxom_config;
@@ -153,6 +155,10 @@ my $fh = new FileHandle;
 );
 @num2month = sort { $month2num{$a} <=> $month2num{$b} } keys %month2num;
 
+## print(STDERR "url() : ".url()."\n");
+## foreach (sort keys %ENV) {
+	## print(STDERR "$_ : $ENV{$_}\n");
+## }
 # Use the stated preferred URL or figure it out automatically. Set
 # $url manually in the config section above if CGI.pm doesn't guess
 # the base URL correctly, e.g. when called from a Server Side Includes
@@ -234,6 +240,7 @@ sub blosxom_html_escape {
                 '<' => '&lt;',
                 '>' => '&gt;',
                 '&' => '&amp;',
+                '\+' => '%2B',
                 '"' => '&quot;',
                 "'" => '&apos;'
                 );
@@ -762,6 +769,7 @@ sub generate {
                     '<' => '&lt;',
                     '>' => '&gt;',
                     '&' => '&amp;',
+		    '\+' => '%2B',
                     '"' => '&quot;',
                     "'" => '&apos;'
                 );
