@@ -608,7 +608,7 @@ $entries = sub {
                             my $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
                             $indexes{$d} = $d;
                         }
-                        $indexes{"$dirname$basename_noext.$file_extension"}
+                        $indexes{ ($dirname ? "$dirname/" : '') . "$basename_noext.$file_extension" }
                             = 1
                             if $static_entries;
                     }
