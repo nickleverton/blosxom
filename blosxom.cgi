@@ -687,6 +687,10 @@ if ( $static_or_dynamic eq 'static' ) {
                         $content_type );
                 }
                 $fh_w->close;
+                if (-z "$static_dir/$fn.$flavour") {
+                    unlink("$static_dir/$fn.$flavour")
+                       or die "Couldn't delete empty $fn.$flavour: $!";
+                }
             }
         }
     }
