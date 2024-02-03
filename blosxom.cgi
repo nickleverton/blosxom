@@ -280,8 +280,8 @@ if ( $ENV{BLOSXOM_CONFIG_FILE} && -r $ENV{BLOSXOM_CONFIG_FILE} ) {
     ( $config_dir = $blosxom_config ) =~ s! / [^/]* $ !!x;
 }
 else {
-    for my $blosxom_config_dir ( $ENV{BLOSXOM_CONFIG_DIR}, '/etc/blosxom',
-        '/etc' )
+    for my $blosxom_config_dir ( $ENV{BLOSXOM_CONFIG_DIR},
+        '/etc/blosxom', '/etc' )
     {
         if ( -r "$blosxom_config_dir/blosxom.conf" ) {
             $config_dir     = $blosxom_config_dir;
@@ -414,7 +414,7 @@ sub blosxom_html_escape {
 # Global variable to be used in head/foot.{flavour} templates
 $path_info = '';
 
-if (!$date_first_in_url) {
+if ( !$date_first_in_url ) {
     # Add all @path_info elements to $path_info till we come to one that could be a year
     while ( $path_info[0] && $path_info[0] !~ /^(19|20)\d{2}$/ ) {
         $path_info .= '/' . shift @path_info;
@@ -479,7 +479,7 @@ while (<DATA>) {
 }
 
 # Plugins: Start
-my $path_sep = $^O eq 'MSWin32' ? ';' : ':';
+my $path_sep    = $^O eq 'MSWin32' ? ';' : ':';
 my @plugin_dirs = split /$path_sep/, $plugin_path;
 unshift @plugin_dirs, $plugin_dir;
 my @plugin_list = ();
@@ -525,7 +525,7 @@ unshift @INC, @plugin_dirs;
 foreach my $plugin (@plugin_list) {
     my ( $plugin_name, $off ) = $plugin =~ /^\d*([\w:]+?)(_?)$/;
     my $plugin_file = $plugin_list ? $plugin_name : $plugin;
-    my $on_off = $off eq '_' ? -1 : 1;
+    my $on_off      = $off eq '_'  ? -1           : 1;
 
     # Allow perl module plugins
     # The -z test is a hack to allow a zero-length placeholder file in a
@@ -537,7 +537,7 @@ foreach my $plugin (@plugin_list) {
     }
     else
     { # we try first to load from $plugin_dir before attempting from $plugin_path
-        eval        { require "$plugin_dir/$plugin_file" }
+        eval { require "$plugin_dir/$plugin_file" }
             or eval { require $plugin_file };
     }
 
@@ -604,12 +604,13 @@ $entries = sub {
                         or stat($static_file)->mtime < $mtime )
                     {
                         $indexes{$dirname} = 1;
-                        if ( $static_date_pages ) {
-                            my $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
+                        if ($static_date_pages) {
+                            my $d = join( '/',
+                                ( nice_date($mtime) )[ 5, 2, 3 ] );
                             $indexes{$d} = $d;
                         }
-                        $indexes{ ($dirname ? "$dirname/" : '') . "$basename_noext.$file_extension" }
-                            = 1
+                        $indexes{ ( $dirname ? "$dirname/" : '' )
+                            . "$basename_noext.$file_extension" } = 1
                             if $static_entries;
                     }
                 }
@@ -687,9 +688,9 @@ if ( $static_or_dynamic eq 'static' ) {
                         $content_type );
                 }
                 $fh_w->close;
-                if (-z "$static_dir/$fn.$flavour") {
+                if ( -z "$static_dir/$fn.$flavour" ) {
                     unlink("$static_dir/$fn.$flavour")
-                       or die "Couldn't delete empty $fn.$flavour: $!";
+                        or die "Couldn't delete empty $fn.$flavour: $!";
                 }
             }
         }
@@ -721,7 +722,7 @@ sub generate {
     my ( $static_or_dynamic, $currentdir, $date_str, $flavour, $content_type )
         = @_;
 
-    %files = %$files;
+    %files  = %$files;
     %others = ref $others ? %$others : ();
 
     # Plugins: Filter
@@ -799,8 +800,8 @@ sub generate {
         };
 
         # Plugins: Sort
-        # Allow for the first encountered plugin::sort subroutine to override the
-        # default built-in sort subroutine
+        # Allow for the first encountered plugin::sort subroutine
+        # to override the default built-in sort subroutine
         foreach my $plugin (@plugins) {
             if ( $plugins{$plugin} > 0 and $plugin->can('sort') ) {
                 if ( my $tmp = $plugin->sort() ) {
@@ -863,7 +864,7 @@ sub generate {
             # template output changes. If you want to have conditionals
             # in your date template so the output can change without the
             # date changing, set $date_break_on_date_string to true.
-            if ( ! $date_break_on_date_string ) {
+            if ( !$date_break_on_date_string ) {
                 if ( $date && $curdate ne $date ) {
                     $curdate = $date;
                     $output .= $date;
@@ -879,7 +880,7 @@ sub generate {
             use vars qw/ $title $body $raw /;
             if ( -f "$path_file" && $fh->open("< $path_file") ) {
                 chomp( $title = <$fh> );
-                chomp( $body = join '', <$fh> );
+                chomp( $body  = join '', <$fh> );
                 $fh->close;
                 $raw = "$title\n$body";
             }
