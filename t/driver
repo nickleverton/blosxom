@@ -81,7 +81,7 @@ if ($static_password) {
       my ($a_short, $b_short) = ($a, $b);
       $a_short =~ s!^.*\.\./!! if $a_short;
       $b_short =~ s!^.*\.\./!! if $b_short;
-      return if $b && $b =~ m! /CVS$ !x;
+      return if $b && ($b =~ m! /CVS$ !x || $b =~ /\/\./);
       if (! $b) {
         fail("$a_short has no corresponding file");
       } elsif (! $a) {
