@@ -2,5 +2,5 @@
 all: test
 
 test: 
-	prove *.t
+	prove -v *.t
 

@@ -8,7 +8,7 @@ dist:
 	rm -rf ../blosxom-$(VERSION)/
 
 test:
-	prove t/*.t
+	prove -v t/*.t
 
 tidycheck:
 	perltidy blosxom.cgi | diff -u blosxom.cgi -
