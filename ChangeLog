@@ -1,3 +1,21 @@
+v2.2.0
+    * Add $date_break_on_date_string config option. When enabled and the
+    date template has conditionals, its output can change and be displayed
+    while the date itself has not changed. Default: off.
+    * Add $date_first_in_url config option. When enabled, allows the date
+    components of the url to only appear at the start and allows subcategories
+    that use a year as their name. Default: off (date components can appear
+    anywhere in the url).
+    * Add $encode_8bit_chars config option. When enabled, escapes all
+    non-standard characters in the URL, which eases things for blog entries
+    with filenames in different encoding than the blog's content. Default: off.
+    * Variables $url_unesc, $path_unesc and $fn_unesc are unescaped versions
+    of URL, path and filename that may be used e.g. for displaying in flavour
+    templates.
+    * PODify the documentation in blosxom.cgi
+    * Improve unit tests.
+    * Various code clarifications.
+
 v2.1.2
     * Fix XSS in $flavour (CVE-2008-2236). Thanks to Yoshinori Ohta of
       Business Architects Inc. for making us aware of this issue.

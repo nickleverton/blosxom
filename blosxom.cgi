@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
 # Blosxom
-# Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2010)
-# Version: 2.1.2 ($Id: blosxom.cgi,v 1.98 2009/07/19 17:18:37 xtaran Exp $)
+# Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2024)
+# Version: 2.2.0
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -271,7 +271,7 @@ use File::stat;
 use Time::Local;
 use CGI qw/:standard :netscape/;
 
-$version = "2.1.2+dev";
+$version = "2.2.0";
 
 # Load configuration from $ENV{BLOSXOM_CONFIG_DIR}/blosxom.conf, if it exists
 my $blosxom_config;
