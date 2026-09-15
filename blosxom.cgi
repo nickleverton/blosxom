@@ -240,11 +240,11 @@ sub blosxom_html_escape {
                 '<' => '&lt;',
                 '>' => '&gt;',
                 '&' => '&amp;',
-                '\+' => '%2B',
+                '+' => '%2B',
                 '"' => '&quot;',
                 "'" => '&apos;'
                 );
-  my $escape_re = join '|' => keys %escape;
+  my $escape_re = join '|', map { quotemeta } sort keys %escape;
   $string =~ s/($escape_re)/$escape{$1}/g;
   $string;
 }
@@ -769,11 +769,11 @@ sub generate {
                     '<' => '&lt;',
                     '>' => '&gt;',
                     '&' => '&amp;',
-		    '\+' => '%2B',
+                    '+' => '%2B',
                     '"' => '&quot;',
                     "'" => '&apos;'
                 );
-                my $escape_re = join '|' => keys %escape;
+                my $escape_re = join '|', map { quotemeta } sort keys %escape;
                 $title =~ s/($escape_re)/$escape{$1}/g;
                 $body  =~ s/($escape_re)/$escape{$1}/g;
                 $url   =~ s/($escape_re)/$escape{$1}/g;
