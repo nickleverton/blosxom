@@ -649,7 +649,7 @@ $entries = sub {
                         $indexes{$dirname} = 1;
                         if ( $static_date_pages ) {
                             my $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
-                            $indexes{$d} = $d;
+                            $indexes{$d} = 1;
                         }
                         $indexes{ ($dirname ? "$dirname/" : '') . "$basename_noext.$file_extension" }
                             = 1
