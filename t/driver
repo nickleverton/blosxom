@@ -69,7 +69,8 @@ if ($static_password) {
     skip "Static tests require 'expected' directory", 1 unless $expected;
     $expected = "$blosxom_config_dir/../$expected" unless $expected =~ m!^/!;
     skip "Static tests 'expected' directory is missing", 1 unless -d $expected;
-    skip "Static tests 'static_dir' directory is missing", 1 unless -d $static_dir;
+    -d $static_dir or mkdir $static_dir
+      or die "mkdir on static_dir '$static_dir' failed: $!";
 
     File::Remove::remove(\1, "$static_dir/*");
 
@@ -80,7 +81,7 @@ if ($static_password) {
       my ($a_short, $b_short) = ($a, $b);
       $a_short =~ s!^.*\.\./!! if $a_short;
       $b_short =~ s!^.*\.\./!! if $b_short;
-      return if $b =~ m! /CVS$ !x;
+      return if $b && $b =~ m! /CVS$ !x;
       if (! $b) {
         fail("$a_short has no corresponding file");
       } elsif (! $a) {

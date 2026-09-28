@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
 # Blosxom
-# Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2008)
+# Author: Rael Dornfest (2002-2003), The Blosxom Development Team (2005-2010)
 # Local mods by Nick Leverton <nick@leverton.org> 2007-2015
-# Local git https://github.com/nickleverton/blosxom/tree/local
-# Version: 2.1.2+njl.2 ($Id: blosxom.cgi,v 1.85 2008/10/02 01:09:41 xtaran Exp $)
+# Local git https://github.com/nickleverton/blosxom/tree/local v2.1.2+njl.2
+# Version: 2.1.2 ($Id: blosxom.cgi,v 1.98 2009/07/19 17:18:37 xtaran Exp $)
 # Home/Docs/Licensing: http://blosxom.sourceforge.net/
 # Development/Downloads: http://sourceforge.net/projects/blosxom
 
@@ -13,10 +13,110 @@ use strict;
 
 package blosxom;
 
+=head1 NAME
+
+blosxom - A lightweight yet feature-packed weblog
+
+=head1 SYNOPSIS
+
+B<blosxom> is a simple web log (blog) CGI script written in perl.
+
+=head1 DESCRIPTION
+
+B<Blosxom> (pronounced "I<blossom>") is a lightweight yet feature-packed
+weblog application designed from the ground up with simplicity,
+usability, and interoperability in mind.
+
+Fundamental is its reliance upon the file system, folders and files
+as its content database. Blosxom's weblog entries are plain text
+files like any other. Write from the comfort of your favorite text
+editor and hit the Save button. Create, edit, rename, and delete entries
+on the command-line, via FTP, WebDAV, or anything else you
+might use to manipulate your files. There's no import or export; entries
+are nothing more complex than title on the first line, body being
+everything thereafter.
+
+Despite its tiny footprint, Blosxom doesn't skimp on features, sporting
+the majority of features one would find in any other Weblog application.
+
+Blosxom is simple, straightforward, minimalist Perl affording even the
+dabbler an opportunity for experimentation and customization. And
+last, but not least, Blosxom is open source and free for the taking and
+altering.
+
+=head1 USAGE
+
+Write a weblog entry, and place it into the main data directory. Place
+the the title is on the first line; the body is everything afterwards.
+For example, create a file named I<first.txt> and put in it something
+like this:
+
+  First Blosxom Post!
+
+  I have successfully installed blosxom on this system.  For more
+  information on blosxom, see the author's <a
+  href="http://blosxom.sourceforge.net/">blosxom site</a>.
+
+Place the file in the directory under the I<$datadir> points to. Be
+sure to change the default location to be somewhere accessable by the
+web server that runs blosxom as a CGI program.
+
+=cut
+
 # --- Configurable variables -----
 
-use vars
-    qw! $version $blog_title $blog_description $blog_language $blog_encoding $datadir $url %template $template $load_templates $depth $num_entries $file_extension $default_flavour $static_or_dynamic $config_dir $plugin_list $plugin_path $plugin_dir $plugin_state_dir @plugins %plugins $static_dir $static_password @static_flavours $static_entries $path_info_full $path_info $path_info_yr $path_info_mo $path_info_da $path_info_mo_num $flavour $static_or_dynamic %month2num @num2month $interpolate $entries $output $header $show_future_entries %files %indexes %others $encode_xml_entities $content_type !;
+use vars qw!
+    $version
+    $blog_title
+    $blog_description
+    $blog_language
+    $blog_encoding
+    $datadir
+    $url
+    %template
+    $template
+    $load_templates
+    $depth
+    $num_entries
+    $file_extension
+    $default_flavour
+    $static_or_dynamic
+    $config_dir
+    $plugin_list
+    $plugin_path
+    $plugin_dir
+    $plugin_state_dir
+    @plugins
+    %plugins
+    $static_dir
+    $static_password
+    @static_flavours
+    $static_date_pages
+    $static_entries
+    $path_info_full
+    $path_info
+    $path_info_yr
+    $path_info_mo
+    $path_info_da
+    $path_info_mo_num
+    $flavour
+    %month2num
+    @num2month
+    $interpolate
+    $entries
+    $output
+    $header
+    $show_future_entries
+    $date_first_in_url
+    %files
+    %indexes
+    %others
+    $encode_xml_entities
+    $encode_8bit_chars
+    $url_escape_re
+    $content_type
+    $date_break_on_date_string
+    !;
 
 # What's this blog's title?
 $blog_title = "My Weblog";
@@ -33,12 +133,16 @@ $blog_encoding = "UTF-8";
 # Where are this blog's entries kept?
 $datadir = "/Library/WebServer/Documents/blosxom";
 
-# What's my preferred base URL for this blog (leave blank for automatic)?
+# What's my preferred base URL for this blog (leave blank for
+# automatic)?
 $url = "";
 
 # Should I stick only to the datadir for items or travel down the
 # directory hierarchy looking for items?  If so, to what depth?
-# 0 = infinite depth (aka grab everything), 1 = datadir only, n = n levels down
+#
+# 0 = infinite depth (aka grab everything), 1 = datadir only,
+# n = n levels down
+
 $depth = 0;
 
 # How many entries should I show on the home page?
@@ -53,10 +157,23 @@ $default_flavour = "html";
 # Should I show entries from the future (i.e. dated after now)?
 $show_future_entries = 0;
 
+# Should date components of the path always be at the front?
+# If this is disabled, the date components can appear anywhere in the
+# url (but always directly after each other, in the year/month/day
+# order). For example, /category/subcategory/2008/12/ (or even
+# /category/2008/12/subcategory/) shows all posts in subcategory from
+# December 2008.
+$date_first_in_url = 0;
+
+# Should I display the date template only when the actual date changes,
+# not the date template? (Only needed if you're using conditionals
+# within your date templates)
+$date_break_on_date_string = 0;
+
 # --- Plugins (Optional) -----
 
-# File listing plugins blosxom should load
-# (if empty blosxom will load all plugins in $plugin_dir and $plugin_path directories)
+# File listing plugins blosxom should load (if empty blosxom will load
+# all plugins in $plugin_dir and $plugin_path directories)
 $plugin_list = "";
 
 # Where are my plugins kept?
@@ -65,8 +182,8 @@ $plugin_dir = "";
 # Where should my plugins keep their state information?
 $plugin_state_dir = "$plugin_dir/state";
 
-# Additional plugins location
-# List of directories, separated by ';' on windows, ':' everywhere else
+# Additional plugins location. A list of directories, separated by ';'
+# on windows, ':' everywhere else.
 $plugin_path = "";
 
 # --- Static Rendering -----
@@ -74,26 +191,84 @@ $plugin_path = "";
 # Where are this blog's static files to be created?
 $static_dir = "/Library/WebServer/Documents/blog";
 
-# What's my administrative password (you must set this for static rendering)?
+# What's my administrative password (you must set this for static
+# rendering)?
 $static_password = "";
 
 # What flavours should I generate statically?
 @static_flavours = qw/html rss/;
 
+# Should I generate static date pages?
+# 0 = no, 1 = yes
+$static_date_pages = 1;
+
 # Should I statically generate individual entries?
 # 0 = no, 1 = yes
 $static_entries = 0;
 
-# Should I encode entities for xml content-types? (plugins can turn this off if they do it themselves)
+# --- Advanced Encoding Options -----
+
+# Should I encode entities for xml content-types? (plugins can turn
+# this off if they do it themselves)
 $encode_xml_entities = 1;
 
-# --- Template variables -----
+# Should I encode 8 bit special characters, e.g. umlauts in URLs, e.g.
+# convert an ISO-Latin-1 \"o to %F6? (off by default for now; plugins
+# can change this, too)
+$encode_8bit_chars = 0;
 
-# --- Callback variables -----
-
-# --- Control variables -----
+# RegExp matching all characters which should be URL encoded in links.
+# Defaults to anything but numbers, letters, slash, colon, dash,
+# underscore and dot.
+$url_escape_re = qr([^-/a-zA-Z0-9:._]);
 
 # --------------------------------
+
+=head1 ENVIRONMENT
+
+=over
+
+=item B<BLOSXOM_CONFIG_FILE>
+
+Points to the location of the configuration file. This will be
+considered as first option, if it's set.
+
+
+=item B<BLOSXOM_CONFIG_DIR>
+
+The here named directory will be tried unless the above mentioned
+environment variable is set and tested for a contained blosxom.conf
+file.
+
+
+=back
+
+
+=head1 FILES
+
+=over
+
+=item B</usr/lib/cgi-bin/blosxom>
+
+The CGI script itself. Please note that the location might depend on
+your installation.
+
+=item B</etc/blosxom/blosxom.conf>
+
+The default configuration file location. This is rather taken as last
+ressort if no other configuration location is set through environment
+variables.
+
+=back
+
+
+=head1 AUTHOR
+
+Rael Dornfest <rael@oreilly.com> was the original author of blosxom. The
+development was picked up by a team of dedicated users of blosxom since
+2005. See <I<http://blosxom.sourceforge.net/>> for more information.
+
+=cut
 
 use FileHandle;
 use File::Find;
@@ -104,7 +279,7 @@ use Time::Local;
 use URI::Escape;
 use CGI qw/:standard :netscape/;
 
-$version = "2.1.2+njl.2";
+$version = "2.1.2+dev+njl.3";
 
 # Load configuration from $ENV{BLOSXOM_CONFIG_DIR}/blosxom.conf, if it exists
 my $blosxom_config;
@@ -167,7 +342,7 @@ unless ($url) {
     $url = url();
 
     # Unescape %XX hex codes (from URI::Escape::uri_unescape)
-    $url =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;      
+    $url =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
 
     # Support being called from inside a SSI document
     $url =~ s/^included:/http:/ if $ENV{SERVER_PROTOCOL} eq 'INCLUDED';
@@ -218,14 +393,14 @@ else {
 # Path Info Magic
 # Take a gander at HTTP's PATH_INFO for optional blog name, archive yr/mo/day
 my @path_info = split m{/}, path_info() || param('path');
-$path_info_full = join '/', @path_info;      # Equivalent to $ENV{PATH_INFO}
+$path_info_full = join '/', @path_info;    # Equivalent to $ENV{PATH_INFO}
 shift @path_info;
 
 # Flavour specified by ?flav={flav} or index.{flav}
 $flavour = '';
 if (! ($flavour = param('flav'))) {
     if ( @path_info && $path_info[$#path_info] =~ /(.+)\.(.+)$/ ) {
-       $flavour = $2;
+        $flavour = $2;
         pop @path_info if $1 eq 'index';
     }
 }
@@ -251,30 +426,37 @@ sub blosxom_html_escape {
 
 # Global variable to be used in head/foot.{flavour} templates
 $path_info = '';
-# Add all @path_info elements to $path_info till we come to one that could be a year
-while ( $path_info[0] && $path_info[0] !~ /^(19|20)\d{2}$/) {
-    $path_info .= '/' . shift @path_info;
+
+if (!$date_first_in_url) {
+    # Add all @path_info elements to $path_info till we come to one that could be a year
+    while ( $path_info[0] && $path_info[0] !~ /^(19|20)\d{2}$/ ) {
+        $path_info .= '/' . shift @path_info;
+    }
 }
 
 # Pull date elements out of path
-if ($path_info[0] && $path_info[0] =~ /^(19|20)\d{2}$/) {
-  $path_info_yr = shift @path_info;
-  if ($path_info[0] && 
-     ($path_info[0] =~ /^(0\d|1[012])$/ || 
-      exists $month2num{ ucfirst lc $path_info_mo })) {
-    $path_info_mo = shift @path_info;
-    # Map path_info_mo to numeric $path_info_mo_num
-    $path_info_mo_num = $path_info_mo =~ /^\d{2}$/
-      ? $path_info_mo
-      : $month2num{ ucfirst lc $path_info_mo };
-    if ($path_info[0] && $path_info[0] =~ /^[0123]\d$/) {
-      $path_info_da = shift @path_info;
+if ( $path_info[0] && $path_info[0] =~ /^(19|20)\d{2}$/ ) {
+    $path_info_yr = shift @path_info;
+    if ($path_info[0]
+        && ( $path_info[0] =~ /^(0\d|1[012])$/
+            || exists $month2num{ ucfirst lc $path_info_mo } )
+        )
+    {
+        $path_info_mo = shift @path_info;
+
+        # Map path_info_mo to numeric $path_info_mo_num
+        $path_info_mo_num
+            = $path_info_mo =~ /^\d{2}$/
+            ? $path_info_mo
+            : $month2num{ ucfirst lc $path_info_mo };
+        if ( $path_info[0] && $path_info[0] =~ /^[0123]\d$/ ) {
+            $path_info_da = shift @path_info;
+        }
     }
-  }
 }
 
 # Add remaining path elements to $path_info
-$path_info .= '/' . join('/', @path_info);
+$path_info .= '/' . join( '/', @path_info );
 
 # Strip leading and trailing slashes from remainder
 $path_info =~ s:^/+::g;
@@ -359,7 +541,7 @@ if ( $plugin_list ) {
 }
 
 # Otherwise walk @plugin_dirs to get list of plugins to use
-if ( ! @plugin_list && @plugin_dirs ) {
+if ( !@plugin_list && @plugin_dirs ) {
     for my $plugin_dir (@plugin_dirs) {
         next unless -d $plugin_dir;
         if ( opendir PLUGINS, $plugin_dir ) {
@@ -389,7 +571,7 @@ foreach my $plugin (@plugin_list) {
     my $on_off = $off eq '_' ? -1 : 1;
 
     # Allow perl module plugins
-    # The -z test is a hack to allow a zero-length placeholder file in a 
+    # The -z test is a hack to allow a zero-length placeholder file in a
     #   $plugin_path directory to indicate an @INC module should be loaded
     if ( $plugin =~ m/::/ && ( $plugin_list || -z $plugin_hash{$plugin} ) ) {
 
@@ -433,24 +615,18 @@ sub load_template {
 # Define default entries subroutine
 $entries = sub {
     my ( %files, %indexes, %others );
+    my $param_all = param('-all');
     find(
         sub {
-            my $d;
             my $curr_depth = $File::Find::dir =~ tr[/][];
             return if $depth and $curr_depth > $depth;
+            return if !-r $File::Find::name;
 
-            if (
-
-                # a match
-                $File::Find::name
-                =~ m!^$datadir/(?:(.*)/)?(.+)\.$file_extension$!
-
-                # not an index, .file, and is readable
-                and $2 ne 'index' and $2 !~ /^\./ and ( -r $File::Find::name )
-                )
+            # if a $file_extension file and not a .file or an index
+            if ( m/^([^.].*)\.$file_extension$/
+                and $1 ne 'index' )
             {
-		my( $dirname, $basename ) = ($1, $2);
-		$dirname = "" unless defined $dirname;
+                my $basename_noext = $1;
 
                 # read modification time
                 my $mtime = stat($File::Find::name)->mtime or return;
@@ -462,22 +638,28 @@ $entries = sub {
                 $files{$File::Find::name} = $mtime;
 
                 # static rendering bits
-                my $static_file
-                    = "$static_dir/$dirname/index." . $static_flavours[0];
-                if (   param('-all')
-                    or !-f $static_file
-                    or stat($static_file)->mtime < $mtime )
-                {
-                    $indexes{$dirname} = 1;
-                    $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
-                    $indexes{$d} = $d;
-                    $indexes{ ( $dirname ? "$dirname/" : '' ) . "$basename.$file_extension" } = 1
-                        if $static_entries;
+                if ( $static_or_dynamic eq 'static' ) {
+                    ( my $dirname = $File::Find::dir ) =~ s!^$datadir/?!!;
+                    my $static_file
+                        = "$static_dir/${dirname}index.$static_flavours[0]";
+                    if (   $param_all
+                        or !-f $static_file
+                        or stat($static_file)->mtime < $mtime )
+                    {
+                        $indexes{$dirname} = 1;
+                        if ( $static_date_pages ) {
+                            my $d = join( '/', ( nice_date($mtime) )[ 5, 2, 3 ] );
+                            $indexes{$d} = $d;
+                        }
+                        $indexes{ ($dirname ? "$dirname/" : '') . "$basename_noext.$file_extension" }
+                            = 1
+                            if $static_entries;
+                    }
                 }
             }
 
             # not an entries match
-            elsif ( !-d $File::Find::name and -r $File::Find::name ) {
+            elsif ( !-d $File::Find::name ) {
                 $others{$File::Find::name} = stat($File::Find::name)->mtime;
             }
         },
@@ -503,11 +685,7 @@ my ( $files, $indexes, $others ) = &$entries();
 %indexes = %$indexes;
 
 # Static
-if (    !$ENV{GATEWAY_INTERFACE}
-    and param('-password')
-    and $static_password
-    and param('-password') eq $static_password )
-{
+if ( $static_or_dynamic eq 'static' ) {
 
     param('-quiet') or print "Blosxom is generating static index pages...\n";
 
@@ -552,6 +730,10 @@ if (    !$ENV{GATEWAY_INTERFACE}
                         $content_type );
                 }
                 $fh_w->close;
+                if (-z "$static_dir/$fn.$flavour") {
+                    unlink("$static_dir/$fn.$flavour")
+                       or die "Couldn't delete empty $fn.$flavour: $!";
+                }
             }
         }
     }
@@ -575,13 +757,13 @@ else {
 # Plugins: End
 foreach my $plugin (@plugins) {
     if ( $plugins{$plugin} > 0 and $plugin->can('end') ) {
-        $entries = $plugin->end();
+        $plugin->end();
     }
 }
 
 # Generate
 sub generate {
-    my ( $static_or_dynamic, $currentdir, $date, $flavour, $content_type )
+    my ( $static_or_dynamic, $currentdir, $date_str, $flavour, $content_type )
         = @_;
 
     %files = %$files;
@@ -590,7 +772,7 @@ sub generate {
     # Plugins: Filter
     foreach my $plugin (@plugins) {
         if ( $plugins{$plugin} > 0 and $plugin->can('filter') ) {
-            $entries = $plugin->filter( \%files, \%others );
+            $plugin->filter( \%files, \%others );
         }
     }
 
@@ -601,23 +783,23 @@ sub generate {
     my $skip;
     foreach my $plugin (@plugins) {
         if ( $plugins{$plugin} > 0 and $plugin->can('skip') ) {
-            if ( my $tmp = $plugin->skip() ) {
-                $skip = $tmp;
-                last;
-            }
+            last if $skip = $plugin->skip();
         }
     }
 
-    # Define default interpolation subroutine
-    $interpolate = sub {
-        package blosxom;
-        my $template = shift;
-        # Interpolate scalars, namespaced scalars, and hash/hashref scalars
-        $template =~ s/(\$\w+(?:::\w+)*(?:(?:->)?{(['"]?)[-\w]+\2})?)/"defined $1 ? $1 : ''"/gee;
-        return $template;
-    };
+    unless ($skip) {
 
-    unless ( defined($skip) and $skip ) {
+        # Define default interpolation subroutine
+        $interpolate = sub {
+
+            package blosxom;
+            my $template = shift;
+
+            # Interpolate scalars, namespaced scalars, and hash/hashref scalars
+            $template
+                =~ s/(\$\w+(?:::\w+)*(?:(?:->)?{([\'\"]?)[-\w]+\2})?)/"defined $1 ? $1 : ''"/gee;
+            return $template;
+        };
 
         # Plugins: Interpolate
         # Allow for the first encountered plugin::interpolate subroutine to
@@ -637,7 +819,7 @@ sub generate {
         # Plugins: Head
         foreach my $plugin (@plugins) {
             if ( $plugins{$plugin} > 0 and $plugin->can('head') ) {
-                $entries = $plugin->head( $currentdir, \$head );
+                $plugin->head( $currentdir, \$head );
             }
         }
 
@@ -645,30 +827,25 @@ sub generate {
 
         $output .= $head;
 
-        # Stories
-        my $curdate = '';
-        my $ne      = $num_entries;
-
         if ( $currentdir =~ /(.*?)([^\/]+)\.(.+)$/ and $2 ne 'index' ) {
             $currentdir = "$1$2.$file_extension";
             %f = ( "$datadir/$currentdir" => $files{"$datadir/$currentdir"} )
                 if $files{"$datadir/$currentdir"};
         }
         else {
-            $currentdir =~ s!/index\..+$!!;
+            $currentdir =~ s! /index\..+$ !!x;
         }
 
         # Define a default sort subroutine
         my $sort = sub {
             my ($files_ref) = @_;
-            return
-                sort { $files_ref->{$b} <=> $files_ref->{$a} }
+            return sort { $files_ref->{$b} <=> $files_ref->{$a} }
                 keys %$files_ref;
         };
 
-     # Plugins: Sort
-     # Allow for the first encountered plugin::sort subroutine to override the
-     # default built-in sort subroutine
+        # Plugins: Sort
+        # Allow for the first encountered plugin::sort subroutine to override the
+        # default built-in sort subroutine
         foreach my $plugin (@plugins) {
             if ( $plugins{$plugin} > 0 and $plugin->can('sort') ) {
                 if ( my $tmp = $plugin->sort() ) {
@@ -678,8 +855,11 @@ sub generate {
             }
         }
 
+        # Stories
+        my $curdate = '';
+        my $ne      = $num_entries;
         foreach my $path_file ( &$sort( \%f, \%others ) ) {
-            last if $ne <= 0 && $date !~ /\d/;
+            last if $ne <= 0 && $date_str !~ /\d/;
             use vars qw/ $path $path_uri $fn $fn_uri /;
             ( $path, $fn )
                 = $path_file =~ m!^$datadir/(?:(.*)/)?(.*)\.$file_extension!;
@@ -707,7 +887,7 @@ sub generate {
 
             # Only stories from the right date
             my ( $path_info_yr, $path_info_mo_num, $path_info_da )
-                = split /\//, $date;
+                = split /\//, $date_str;
             next if $path_info_yr     && $yr != $path_info_yr;
             last if $path_info_yr     && $yr < $path_info_yr;
             next if $path_info_mo_num && $mo ne $num2month[$path_info_mo_num];
@@ -720,18 +900,28 @@ sub generate {
             # Plugins: Date
             foreach my $plugin (@plugins) {
                 if ( $plugins{$plugin} > 0 and $plugin->can('date') ) {
-                    $entries
-                        = $plugin->date( $currentdir, \$date,
-                        $files{$path_file}, $dw, $mo, $mo_num, $da, $ti,
-                        $yr );
+                    $plugin->date( $currentdir, \$date, $files{$path_file},
+                        $dw, $mo, $mo_num, $da, $ti, $yr );
                 }
             }
 
             $date = &$interpolate($date);
 
-            if ( $date && $curdate ne $date ) {
-                $curdate = $date;
-                $output .= $date;
+            # Traditionally blosxom displays the date whenever the date
+            # template output changes. If you want to have conditionals
+            # in your date template so the output can change without the
+            # date changing, set $date_break_on_date_string to true.
+            if ( ! $date_break_on_date_string ) {
+                if ( $date && $curdate ne $date ) {
+                    $curdate = $date;
+                    $output .= $date;
+                }
+            }
+            else {
+                if ( $date && $curdate ne "$yr/$mo_num/$da" ) {
+                    $curdate = "$yr/$mo_num/$da";
+                    $output .= $date;
+                }
             }
 
             use vars qw/ $title $body $raw /;
@@ -746,39 +936,38 @@ sub generate {
             # Plugins: Story
             foreach my $plugin (@plugins) {
                 if ( $plugins{$plugin} > 0 and $plugin->can('story') ) {
-                    $entries = $plugin->story( $path, $fn, \$story, \$title,
-                        \$body );
+                    $plugin->story( $path, $fn, \$story, \$title, \$body );
                 }
             }
 
-            if ( $encode_xml_entities &&
-                 $content_type =~ m{\bxml\b} &&
-                 $content_type !~ m{\bxhtml\b} ) {
+            # Save unescaped versions and allow them to be used in
+            # flavour templates.
+            use vars qw/$url_unesc $path_unesc $fn_unesc/;
+            $url_unesc  = $url;
+            $path_unesc = $path;
+            $fn_unesc   = $fn;
+
+            # Fix special characters in links inside XML content
+            if (   $encode_xml_entities
+                && $content_type =~ m{\bxml\b}
+                && $content_type !~ m{\bxhtml\b} )
+            {
+
                 # Escape special characters inside the <link> container
 
-                # The following line should be moved more towards to top for
-                # performance reasons -- Axel Beckert, 2008-07-22
-                my $url_escape_re = qr([^-/a-zA-Z0-9:._]);
-
-                $url   =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
-                $path  =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
-                $fn    =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
+                &url_escape_url_path_and_fn();
 
                 # Escape <, >, and &, and to produce valid RSS
-                my %escape = (
-                    '<' => '&lt;',
-                    '>' => '&gt;',
-                    '&' => '&amp;',
-                    '+' => '%2B',
-                    '"' => '&quot;',
-                    "'" => '&apos;'
-                );
-                my $escape_re = join '|', map { quotemeta } sort keys %escape;
-                $title =~ s/($escape_re)/$escape{$1}/g;
-                $body  =~ s/($escape_re)/$escape{$1}/g;
-                $url   =~ s/($escape_re)/$escape{$1}/g;
-                $path  =~ s/($escape_re)/$escape{$1}/g;
-                $fn    =~ s/($escape_re)/$escape{$1}/g;
+                $title = blosxom_html_escape($title);
+                $body  = blosxom_html_escape($body);
+                $url   = blosxom_html_escape($url);
+                $path  = blosxom_html_escape($path);
+                $fn    = blosxom_html_escape($fn);
+            }
+
+            # Fix special characters in links inside XML content
+            if ($encode_8bit_chars) {
+                &url_escape_url_path_and_fn();
             }
 
             $story = &$interpolate($story);
@@ -795,7 +984,7 @@ sub generate {
         # Plugins: Foot
         foreach my $plugin (@plugins) {
             if ( $plugins{$plugin} > 0 and $plugin->can('foot') ) {
-                $entries = $plugin->foot( $currentdir, \$foot );
+                $plugin->foot( $currentdir, \$foot );
             }
         }
 
@@ -805,7 +994,7 @@ sub generate {
         # Plugins: Last
         foreach my $plugin (@plugins) {
             if ( $plugins{$plugin} > 0 and $plugin->can('last') ) {
-                $entries = $plugin->last();
+                $plugin->last();
             }
         }
 
@@ -838,6 +1027,12 @@ sub nice_date {
         . sprintf( "%02d", ( $offset % 3600 ) / 60 );
 
     return ( $dw, $mo, $mo_num, $da, $ti, $yr, $utc_offset );
+}
+
+sub url_escape_url_path_and_fn {
+    $url  =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
+    $path =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
+    $fn   =~ s($url_escape_re)(sprintf('%%%02X', ord($&)))eg;
 }
 
 # Default HTML and RSS template bits

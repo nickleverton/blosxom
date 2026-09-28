@@ -7,4 +7,9 @@ dist:
 	cd .. && tar cvzf blosxom-$(VERSION).tar.gz --exclude=CVS --exclude='*~' --exclude=".??*" --exclude="#*#" --exclude="*.t" blosxom-$(VERSION)/
 	rm -rf ../blosxom-$(VERSION)/
 
+test:
+	prove t/*.t
+
+tidycheck:
+	perltidy blosxom.cgi | diff -u blosxom.cgi -
 
