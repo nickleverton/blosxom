@@ -705,7 +705,7 @@ if ( $static_or_dynamic eq 'static' ) {
                 $content_type =~ s!\n.*!!s;
                 my $fn = $p =~ m!^(.+)\.$file_extension$! ? $1 : "$p/index";
                 param('-quiet') or print "$fn.$flavour\n";
-                my $fh_w = new FileHandle "> $static_dir/$fn.$flavour"
+                my $fh_w = new FileHandle("$static_dir/$fn.$flavour", ">")
                     or die "Couldn't open $static_dir/$p for writing: $!";
                 $output = '';
                 if ( $indexes{$path} == 1 ) {
