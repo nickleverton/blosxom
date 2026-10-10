@@ -1042,7 +1042,7 @@ html content_type text/html; charset=$blog_encoding
 html head <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 html head <html>
 html head     <head>
-html head         <meta http-equiv="content-type" content="$content_type;charset=$blog_encoding" />
+html head         <meta http-equiv="content-type" content="$content_type" />
 html head         <link rel="alternate" type="application/rss+xml" title="RSS" href="$url/index.rss" />
 html head         <title>$blog_title $path_info_da $path_info_mo $path_info_yr</title>
 html head     </head>
