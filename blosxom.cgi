@@ -345,7 +345,7 @@ unless ($url) {
     $url =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
 
     # Support being called from inside a SSI document
-    $url =~ s/^included:/http:/ if $ENV{SERVER_PROTOCOL} eq 'INCLUDED';
+    $url =~ s/^included:/http:/ if exists $ENV{SERVER_PROTOCOL} && $ENV{SERVER_PROTOCOL} eq 'INCLUDED';
 
     # Remove PATH_INFO if it is set but not removed by CGI.pm. This
     # seems to happen when used with Apache's Alias directive or if
@@ -392,7 +392,7 @@ else {
 
 # Path Info Magic
 # Take a gander at HTTP's PATH_INFO for optional blog name, archive yr/mo/day
-my @path_info = split m{/}, path_info() || param('path');
+my @path_info = split m{/}, path_info() || param('path') || "";
 $path_info_full = join '/', @path_info;    # Equivalent to $ENV{PATH_INFO}
 shift @path_info;
 
