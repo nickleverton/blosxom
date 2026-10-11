@@ -503,7 +503,7 @@ $load_templates = sub {
   while ($_ = $fh->getline) {
     last if /^__(?:DATA|END)__$/;
     next if /^\s*(?:#|$)/;	# ignore template comments + blank lines
-    my($flavour, $chunk, $txt) = split( /\s+/, $_, 3 );
+    my($flavour, $chunk, $txt) = split( /\s/, $_, 3 );
     $txt = "\n" unless defined $txt && length $txt;
     # print STDERR "load_template: $flavour, $chunk, $txt";
     $txt =~ s/\\n/\n/mg;
