@@ -10,6 +10,9 @@ dist:
 test:
 	prove t/*.t
 
+fixup-tests:
+	find t/*/expected* -type f | xargs ./fixup-tests.sh
+
 tidycheck:
 	perltidy blosxom.cgi | diff -u blosxom.cgi -
 
