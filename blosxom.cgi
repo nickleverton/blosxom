@@ -504,7 +504,7 @@ $load_templates = sub {
     last if /^__(?:DATA|END)__$/;
     next if /^\s*(?:#|$)/;	# ignore template comments + blank lines
     my($flavour, $chunk, $txt) = split( /\s+/, $_, 3 );
-    next unless defined $txt;
+    $txt = "\n" unless defined $txt && length $txt;
     # print STDERR "load_template: $flavour, $chunk, $txt";
     $txt =~ s/\\n/\n/mg;
     if( ! defined $last_flavour || $flavour ne $last_flavour || $chunk ne $last_chunk ) {
